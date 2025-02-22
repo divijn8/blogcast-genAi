@@ -11,7 +11,7 @@
             <div class="col-md-12">
                 <div class="card">
                     <div class="card-body">
-                        <form action="/admin/categories" method="POST" class="form">
+                        <form action={{ route('admin.categories.store') }} method="POST" class="form">
                             @csrf
                             <div class="mb-3">
                                 <label for="name" class="form-label">Name</label>

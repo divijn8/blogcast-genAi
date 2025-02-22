@@ -6,9 +6,10 @@
     <!-- Page Heading -->
 <div class="d-sm-flex align-items-center justify-content-between mb-4">
     <h1 class="h3 mb-0 text-gray-800">Categories</h1>
-    <a href="/admin/categories/create" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm"><i
+    <a href={{ route('admin.categories.create') }} class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm"><i
             class="fas fa-cog fa-sm text-white-50"></i> Create Category</a>
 </div>
+@include('admin.layouts._alerts')
 <div class="card">
     <div class="card-body">
         <div class="row">
