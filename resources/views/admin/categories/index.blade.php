@@ -18,7 +18,10 @@
                         <tr>
                             <td>{{$category->id}}</td>
                             <td>{{$category->name}}</td>
-                            <td></td>
+                            <td>
+                                <a href="" class="btn btn-outline-warning"><i class="fas fa-edit"></i></a>
+                                <button class="btn btn-outline-danger"><i class="fas fa-trash"></i></button>
+                            </td>
                         </tr>
                         @endforeach
                     </tbody>
