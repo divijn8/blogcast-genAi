@@ -29,7 +29,7 @@
     <div class="card-footer">
         <div class="row">
             <div class="col-md-12">
-                {{$categories->links()}}
+                {{$categories->links('vendor.pagination.bootstrap-5')}}
             </div>
         </div>
     </div>
