@@ -21,6 +21,7 @@ Route::delete('admin/categories/{category}', [\App\Http\Controllers\admin\Catego
 //tags
 Route::prefix('admin')->name('admin.')->group(function () {
     Route::resource('tags', \App\Http\Controllers\admin\TagsController::class)->except(['show']);
+    Route::resource('posts',\App\Http\Controllers\PostsController::class);
 });
 
 
