@@ -15,7 +15,7 @@ class BlogsController extends Controller
         ]));
     }
 
-    public function singleBlog(Request $request, string $slug) {
+    public function show(Request $request, string $slug) {
         $post = Post::where('slug', $slug)->firstOrFail();
         $this->trackViewCount($post);
         return view('frontend.blog', compact([
@@ -33,6 +33,6 @@ class BlogsController extends Controller
             Cookie::queue($cookieName, true, 60*24);
         }
     }
-    
+
 
 }
