@@ -18,6 +18,7 @@
     <!-- Custom styles for this template-->
     <link href="{{ asset('admin/css/sb-admin-2.min.css') }}" rel="stylesheet">
 
+    @yield('page-level-styles')
 </head>
 
 <body id="page-top">
