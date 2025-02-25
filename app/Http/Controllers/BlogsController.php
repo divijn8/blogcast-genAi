@@ -13,4 +13,12 @@ class BlogsController extends Controller
             'posts'
         ]));
     }
+
+    public function singleBlog(Request $request, string $slug) {
+        $post = Post::where('slug', $slug)->first();
+        return view('frontend.blog', compact([
+            'post'
+        ]));
+    }
+
 }

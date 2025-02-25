@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 
 //blogs -> frontend
 Route::get('/', [\App\Http\Controllers\BlogsController::class, 'blogs']);
+Route::get('/blogs/{slug}', [\App\Http\Controllers\BlogsController::class, 'singleBlog'])->name('frontend.singleBlog');
 
 //categories ->admin
 Route::get('admin/categories', [\App\Http\Controllers\admin\CategoriesController::class, 'index'])->name('admin.categories.index');
