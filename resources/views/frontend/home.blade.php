@@ -13,8 +13,7 @@
             <p class="mt25">
                {{ $post->excerpt}}
             </p>
-            <a href="#" class="button button-gray button-xs">Read More <i class="fa fa-long-arrow-right"></i></a>
-
+            <a href="{{ route('frontend.show', $post->slug) }}" class="button button-gray button-xs">Read More <i class="fa fa-long-arrow-right"></i></a>
         </div>
         @endforeach
     </div>
