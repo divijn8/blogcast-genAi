@@ -22,7 +22,7 @@ class PostFactory extends Factory
             'excerpt' => fake()->paragraph,
             'body' => fake()->paragraphs(random_int(5, 8), true),
             'category_id' => Category::all('id')->random()->id,
-            'thumbnail' => 'thumbnails/' . random_int(1, 20) . ".jpg"
+            'thumbnail' => 'thumbnails/' . random_int(1, 35) . ".jpg"
         ];
     }
 }
