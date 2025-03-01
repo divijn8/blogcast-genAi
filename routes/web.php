@@ -3,7 +3,7 @@
 use Illuminate\Support\Facades\Route;
 
 //blogs -> frontend
-Route::get('/', [\App\Http\Controllers\BlogsController::class, 'blogs']);
+Route::get('/', [\App\Http\Controllers\BlogsController::class, 'blogs'])->name('frontend.home');
 Route::get('/blogs/{slug}', [\App\Http\Controllers\BlogsController::class, 'show'])->name('frontend.show');
 Route::get('/blogs/categories/{category}', [\App\Http\Controllers\BlogsController::class, 'showByCategory'])->name('frontend.showByCategory');
 
