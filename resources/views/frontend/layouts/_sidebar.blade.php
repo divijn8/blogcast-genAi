@@ -24,13 +24,10 @@
                         <span class="heading-divider mt10"></span>
                     </h5>
                     <ul class="blog-sidebar pl25">
-                        <li class="active"><a href="#">Programmig<span class="badge badge-pasific pull-right">14</span></a>
-                        </li>
-                        <li><a href="#">Java<span class="badge badge-pasific pull-right">125</span></a></li>
-                        <li><a href="#">C#<span class="badge badge-pasific pull-right">350</span></a></li>
-                        <li><a href="#">Web Developement<span class="badge badge-pasific pull-right">520</span></a></li>
-                        <li><a href="#">Laravel<span class="badge badge-pasific pull-right">1,290</span></a></li>
-                        <li><a href="#">PHP<span class="badge badge-pasific pull-right">7</span></a></li>
+                        @foreach($categories as $category)
+                        <li><a href="{{ route('frontend.showByCategory', $category->slug) }}">{{ $category->name }}<span class="badge badge-pasific pull-right">{{ $category->posts()->count() }}</span></a>
+                    </li>
+                    @endforeach
                     </ul>
 
                 </div>
