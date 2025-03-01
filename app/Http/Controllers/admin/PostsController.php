@@ -54,7 +54,7 @@ class PostsController extends Controller
                 $data['thumbnail']=$filePath;
             }
 
-            $data['author_id']= auth()->id;
+            $data['author_id']= auth()->id();
             $post=Post::create($data);
             $post->tags()->attach($request->tags);
 
@@ -82,6 +82,10 @@ class PostsController extends Controller
      */
     public function edit(Post $post)
     {
+        if($post->author_id !== auth()->id()) {
+            abort(403);
+        }
+
         $categories=Category::all();
         $tags=Tag::all();
         return view('admin.posts.edit',compact([
