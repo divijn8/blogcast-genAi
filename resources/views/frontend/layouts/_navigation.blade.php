@@ -13,13 +13,23 @@
         </div>
 
         <div class="navbar-collapse collapse navbar-main-collapse">
-            <ul class="nav navbar-nav">
-                <li>
+            <ul class="nav navbar-nav d-flex align-items-center">
+                <li class="nav-item">
                     <a href="index.html" data-toggle="dropdown" class="dropdown-toggle color-light">Home </a>
                 </li>
-                <li>
-                    <a href="{{ route('login') }}">Login </a>
-                </li>
+                @auth
+                    <li class="nav-item mt-36">
+                        <form action="{{ route('logout') }}" method="POST">
+                            @csrf
+                            <button class="btn btn-danger btn-sm">LOGOUT</button>
+                        </form>
+                    </li>
+                @else
+                    <li>
+                        <a href="{{ route('login') }}">LOGIN</a>
+                    </li>
+                @endauth
+
             </ul>
 
         </div>
