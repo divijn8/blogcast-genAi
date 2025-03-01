@@ -25,9 +25,9 @@
                     </h5>
                     <ul class="blog-sidebar pl25">
                         @foreach($categories as $category)
-                        <li><a href="{{ route('frontend.showByCategory', $category->slug) }}">{{ $category->name }}<span class="badge badge-pasific pull-right">{{ $category->posts()->count() }}</span></a>
-                    </li>
-                    @endforeach
+                            <li><a href="{{ route('frontend.showByCategory', $category->slug) }}">{{ $category->name }}<span class="badge badge-pasific pull-right">{{ $category->posts_count }}</span></a>
+                        </li>
+                        @endforeach
                     </ul>
 
                 </div>

@@ -12,7 +12,12 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('categories', function (Blueprint $table) {
-            //
+            $table->unsignedBigInteger('posts_count')->default(0)->after('slug');
+        });
+
+        \App\Models\Category::all()->each(function ($category) {
+            $category->posts_count = $category->posts()->count();
+            $category->save();
         });
     }
 
@@ -22,7 +27,7 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('categories', function (Blueprint $table) {
-            //
+            $table->dropColumn('posts_count');
         });
     }
 };
