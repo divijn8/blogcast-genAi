@@ -9,7 +9,10 @@ use Illuminate\Support\Facades\Cookie;
 class BlogsController extends Controller
 {
     public function blogs() {
-        $posts = Post::latest()->simplePaginate(9);
+        $posts = Post::with('author')
+                     ->latest()
+                     ->simplePaginate(9);
+                     
         return view('frontend.home', compact([
             'posts'
         ]));
