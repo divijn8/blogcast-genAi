@@ -37,7 +37,9 @@ class BlogsController extends Controller
         $post = Post::where('slug', $slug)->firstOrFail();
         $this->trackViewCount($post);
         return view('frontend.blog', compact([
-            'post'
+            'posts',
+            'categories',
+            'tags'
         ]));
 
     }
