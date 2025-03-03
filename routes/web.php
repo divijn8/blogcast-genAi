@@ -1,5 +1,6 @@
 <?php
 
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
 //blogs -> frontend
@@ -27,6 +28,13 @@ Route::prefix('admin')->name('admin.')->middleware(['auth'])->group(function () 
         return view('admin.dashboard');
     })->name('dashboard');
 });
+
+Route::middleware(['auth'])->group((function() {
+    Route::get('/subscriptions',[\App\Http\Controllers\admin\SubscriptionController::class,'showPlans'])->name('subscriptions.index');
+    Route::get('/subscriptions/{planId}/checkout',[\App\Http\Controllers\admin\SubscriptionController::class,'createCheckoutSession'])->name('subscription.checkout');
+    Route::get('/subscriptions/success/{planId}',[\App\Http\Controllers\admin\SubscriptionController::class,'success'])->name('subscription.success');
+    Route::get('/subscriptions/cancel',[\App\Http\Controllers\admin\SubscriptionController::class,'cancel'])->name('subscription.cancel');
+}));
 
 
 Auth::routes();
