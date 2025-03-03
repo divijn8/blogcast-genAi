@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\Category;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -15,7 +16,7 @@ return new class extends Migration
             $table->unsignedBigInteger('posts_count')->default(0)->after('slug');
         });
 
-        \App\Models\Category::all()->each(function ($category) {
+        Category::all()->each(function ($category) {
             $category->posts_count = $category->posts()->count();
             $category->save();
         });
