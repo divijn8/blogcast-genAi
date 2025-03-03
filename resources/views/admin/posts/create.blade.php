@@ -47,7 +47,54 @@
                         </div>
                         <div class="mb-3">
                             <label for="body" class="form-label">Body</label>
-                            <trix-editor input="body"></trix-editor>
+                            <trix-toolbar id="my_toolbar">
+                                <div class="trix-button-row">
+                                  <span class="trix-button-group trix-button-group--text-tools" data-trix-button-group="text-tools">
+                                    <button type="button" class="trix-button trix-button--icon trix-button--icon-bold" data-trix-attribute="bold" data-trix-key="b" title="Bold" tabindex="-1">Bold</button>
+                                    <button type="button" class="trix-button trix-button--icon trix-button--icon-italic" data-trix-attribute="italic" data-trix-key="i" title="Italics" tabindex="-1">Italics</button>
+                                    <button type="button" class="trix-button trix-button--icon trix-button--icon-strike" data-trix-attribute="strike" title="Strikg" tabindex="-1">Strikg</button>
+                                    <button type="button" class="trix-button trix-button--icon trix-button--icon-link" data-trix-attribute="href" data-trix-action="link" data-trix-key="k" title="Link" tabindex="-1">Link</button>
+                                  </span>
+
+                                    <span class="trix-button-group trix-button-group--block-tools" data-trix-button-group="block-tools">
+        <button type="button" class="trix-button trix-button--icon trix-button--icon-heading-1" data-trix-attribute="heading1" title="Heading 1" tabindex="-1">Heading 1</button>
+        <button type="button" class="trix-button trix-button--icon trix-button--icon-quote" data-trix-attribute="quote" title="Quote" tabindex="-1">Quote</button>
+        <button type="button" class="trix-button trix-button--icon trix-button--icon-code" data-trix-attribute="code" title="Code" tabindex="-1">Code</button>
+        <button type="button" class="trix-button trix-button--icon trix-button--icon-bullet-list" data-trix-attribute="bullet" title="Bullets" tabindex="-1">${lang.bullets}</button>
+        <button type="button" class="trix-button trix-button--icon trix-button--icon-number-list" data-trix-attribute="number" title="Numbering" tabindex="-1">Numbering</button>
+        <button type="button" class="trix-button trix-button--icon trix-button--icon-decrease-nesting-level" data-trix-action="decreaseNestingLevel" title="Outdent" tabindex="-1">Outdent</button>
+        <button type="button" class="trix-button trix-button--icon trix-button--icon-increase-nesting-level" data-trix-action="increaseNestingLevel" title="Indent" tabindex="-1">Indent</button>
+      </span>
+
+                                    <span class="trix-button-group trix-button-group--file-tools" data-trix-button-group="file-tools">
+                                        <button type="button" class="trix-button trix-button--icon trix-button--icon-attach" data-trix-action="attachFiles" title="Attach Files" tabindex="-1">Attach Files</button>
+                                    </span>
+                                    <span class="trix-button-group" data-trix-button-group="ai">
+                                        <button id="generateArticleFromAI" type="button" class="trix-button" title="Generate Article With AI" tabindex="-1"><i class="fas fa-magic"></i></button>
+                                    </span>
+
+                                    <span class="trix-button-group-spacer"></span>
+
+                                    <span class="trix-button-group trix-button-group--history-tools" data-trix-button-group="history-tools">
+        <button type="button" class="trix-button trix-button--icon trix-button--icon-undo" data-trix-action="undo" data-trix-key="z" title="Undo" tabindex="-1">Undo</button>
+        <button type="button" class="trix-button trix-button--icon trix-button--icon-redo" data-trix-action="redo" data-trix-key="shift+z" title="Redo" tabindex="-1">Redo</button>
+      </span>
+                                </div>
+
+                                <div class="trix-dialogs" data-trix-dialogs>
+                                    <div class="trix-dialog trix-dialog--link" data-trix-dialog="href" data-trix-dialog-attribute="href">
+                                        <div class="trix-dialog__link-fields">
+                                            <input type="url" name="href" class="trix-input trix-input--dialog" placeholder="${lang.urlPlaceholder}" aria-label="${lang.url}" data-trix-validate-href required data-trix-input>
+                                            <div class="trix-button-group">
+                                                <input type="button" class="trix-button trix-button--dialog" value="${lang.link}" data-trix-method="setAttribute">
+                                                <input type="button" class="trix-button trix-button--dialog" value="${lang.unlink}" data-trix-method="removeAttribute">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </trix-toolbar>
+
+                            <trix-editor input="body" toolbar="my_toolbar"></trix-editor>
                             <input type="hidden"
                                    class="form-control @error('body')is-invalid @enderror"
                                    name="body"
@@ -115,5 +162,32 @@
     <script type="text/javascript" src="https://unpkg.com/trix@2.0.8/dist/trix.umd.min.js"></script>
     <script>
         $('.select2').select2();
+    </script>
+    <script>
+        function generateArticleFromAI(evt) {
+            const title = document.getElementById('title').value;
+            const excerpt = document.getElementById('excerpt').value;
+            const csrfToken = document.querySelector('meta[name="csrf-token"]').content;
+
+            // if(!title || !excerpt) {
+            //     alert("You need to fill title and excerpt for AI to generate the content.");
+            //     return;
+            // }
+
+            fetch('/api/posts/generate-ai', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': csrfToken
+                },
+                body: JSON.stringify({ title, excerpt})
+            })
+                .then(res => res.json())
+                .then(data => {
+                    document.querySelector('trix-editor').editor.insertHTML(data.content);
+                })
+                .catch(err => console.warn(err));
+        }
+        document.getElementById('generateArticleFromAI').addEventListener('click', generateArticleFromAI);
     </script>
 @endsection
