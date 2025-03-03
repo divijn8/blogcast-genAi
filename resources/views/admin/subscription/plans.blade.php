@@ -6,7 +6,7 @@
         @foreach ($plans as $plan)
             <li>
                 <strong>{{ $plan->name }}</strong> - ${{ number_format($plan->price) }} per {{ $plan->interval }} <br>
-                <a href="#" class="button button-sm button-pasific hover-ripple-out">Subscribe Now</a>
+                <a href="{{route('subscription.checkout',$plan->id)}}" class="button button-sm button-pasific hover-ripple-out">Subscribe Now</a>
             </li>
         @endforeach
     </ul>
