@@ -2,18 +2,19 @@
 
 namespace App\Http\Controllers\admin;
 
+use App\Http\Controllers\Controller;
 use App\Http\Requests\CreatePostRequest;
 use App\Http\Requests\UpdatePostRequest;
 use App\Models\Category;
 use App\Models\Post;
 use App\Models\Tag;
+use App\Models\User;
+use GuzzleHttp\Client;
+
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
-use App\Http\Controllers\Controller;
-use GuzzleHttp\Client;
-
 
 class PostsController extends Controller
 {
@@ -22,13 +23,8 @@ class PostsController extends Controller
      */
     public function index()
     {
-        $posts = Post::with('category')
-            ->with('tags')
-            ->where('author_id', auth()->id())
-            ->latest()
-            ->paginate(20);
-
-        return view('admin.posts.index', compact([
+        $posts=Post::with('category')->with('tags')->latest()->paginate(20);
+        return view('admin.posts.index',compact([
             'posts'
         ]));
     }
@@ -38,9 +34,9 @@ class PostsController extends Controller
      */
     public function create()
     {
-        $categories = Category::all();
-        $tags = Tag::all();
-        return view('admin.posts.create', compact([
+        $categories=Category::all();
+        $tags=Tag::all();
+        return view('admin.posts.create',compact([
             'categories',
             'tags'
         ]));
@@ -53,26 +49,25 @@ class PostsController extends Controller
     {
         DB::beginTransaction();
 
-        try {
+        try{
             $data = $request->validated();
             if($request->hasFile('thumbnail')) {
-                $filePath = $request->file('thumbnail')->store('thumbnails', 'public');
-                $data['thumbnail'] = $filePath;
+                $filePath = $request->file('thumbnail')->store('thumbnails','public');
+                $data['thumbnail']=$filePath;
             }
 
-            $data['author_id'] = auth()->id();
-
-            $post = Post::create($data);
+            $data['author_id']= auth()->id();
+            $post=Post::create($data);
             $post->tags()->attach($request->tags);
 
             DB::commit();
             return redirect()->route('admin.posts.index')
-                ->with('success', 'Post created successfully!');
-        } catch(\Exception $e) {
+                             ->with('success','Post created successfully');
+        }catch(\Exception $e) {
             DB::rollBack();
             Log::error($e);
             return redirect()->route('admin.posts.index')
-                ->with('error', 'Some internal server issue!');
+                             ->with('error','Server isuues.Try again later!');
         }
     }
 
@@ -89,12 +84,9 @@ class PostsController extends Controller
      */
     public function edit(Post $post)
     {
-        if($post->author_id !== auth()->id()) {
-            abort(403);
-        }
-        $categories = Category::all();
-        $tags = Tag::all();
-        return view('admin.posts.edit', compact([
+        $categories=Category::all();
+        $tags=Tag::all();
+        return view('admin.posts.edit',compact([
             'post',
             'categories',
             'tags'
@@ -106,16 +98,16 @@ class PostsController extends Controller
      */
     public function update(UpdatePostRequest $request, Post $post)
     {
-        $data = $request->validated();
+        $data=$request->validated();
         if($request->hasFile('thumbnail')) {
             Storage::disk('public')->delete($post->thumbnail);
-            $data['thumbnail'] = $request->file('thumbnail')->store('thumbnails', 'public');
+            $data['thumbnail']=$request->file('thumbnail')->store('thumbnails','public');
         }
         $post->update($data);
         $post->tags()->sync($request->tags);
 
         return redirect()->route('admin.posts.index')
-            ->with('success', 'Post updated successfully!');
+                        ->with('success','Post updated successfully');
     }
 
     /**
@@ -123,8 +115,15 @@ class PostsController extends Controller
      */
     public function destroy(Post $post)
     {
-        //
+        if($post->thumbnail && Storage::disk('public')->exists($post->thumbnail)) {
+            Storage::disk('public')->delete($post->thumbnail);
+        }
+        $post->tags()->detach();
+        $post->delete();
+        return redirect()->route('admin.posts.index')
+            ->with('success', 'Post Deleted Successfully!');
     }
+
     private function generatePrompt($title, $excerpt) {
         $prompt = <<<PROMPT
 You are a professional content writer and I want you to generate an HTML blog article with the following specifications:
@@ -147,7 +146,12 @@ PROMPT;
 
         return $prompt;
     }
-    public function generateAI(Request $request) {
+    public function generateAI(Request $request,$token) {
+        $user = User::where('user_token',$token)->firstOrFail();
+        if(!$user->canGenerateArticle()){
+            return response()->json(['content'=>'You have reached ur limit','status'=>401]);
+        }
+
         $title = $request->title;
         $excerpt = $request->excerpt;
 
@@ -171,8 +175,17 @@ PROMPT;
         if($response->getStatusCode() === 200) {
             $responseData = json_decode($response->getBody(), true);
             Log::info($responseData['candidates'][0]['content']['parts'][0]['text']);
+
+            if(!$user->canGenerateArticle()){
+                $user->actveSuscription()->decrement('articles_remaining');
+            }
+
+            $user->increment('articles_generated');
+            return response()->json(['content'=>$responseData['candidates'][0]['content']['parts'][0]['text'], 'status'=>200]);
         }
 
-        return response()->json(['content'=>$responseData['candidates'][0]['content']['parts'][0]['text'], 'status'=>200]);
+        return response()->json(['content'=>'You have reached ur limit','status'=>403]);
     }
+
+
 }
