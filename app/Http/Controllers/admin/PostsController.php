@@ -5,6 +5,7 @@ namespace App\Http\Controllers\admin;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\CreatePostRequest;
 use App\Http\Requests\UpdatePostRequest;
+use App\Jobs\DispatchPostNotificationJob;
 use App\Mail\NewBlogNotification;
 use App\Models\Category;
 use App\Models\Post;
@@ -64,8 +65,7 @@ class PostsController extends Controller
 
             DB::commit();
 
-            Mail::to('saachi@gmail.com')
-                ->send(new NewBlogNotification($post));
+            DispatchPostNotificationJob::dispatch($post->id);
             return redirect()->route('admin.posts.index')
                              ->with('success','Post created successfully');
         }catch(\Exception $e) {
