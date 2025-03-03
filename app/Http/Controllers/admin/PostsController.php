@@ -5,6 +5,7 @@ namespace App\Http\Controllers\admin;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\CreatePostRequest;
 use App\Http\Requests\UpdatePostRequest;
+use App\Mail\NewBlogNotification;
 use App\Models\Category;
 use App\Models\Post;
 use App\Models\Tag;
@@ -14,6 +15,7 @@ use GuzzleHttp\Client;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Storage;
 
 class PostsController extends Controller
@@ -61,6 +63,9 @@ class PostsController extends Controller
             $post->tags()->attach($request->tags);
 
             DB::commit();
+
+            Mail::to('saachi@gmail.com')
+                ->send(new NewBlogNotification($post));
             return redirect()->route('admin.posts.index')
                              ->with('success','Post created successfully');
         }catch(\Exception $e) {
@@ -123,6 +128,7 @@ class PostsController extends Controller
         return redirect()->route('admin.posts.index')
             ->with('success', 'Post Deleted Successfully!');
     }
+
 
     private function generatePrompt($title, $excerpt) {
         $prompt = <<<PROMPT
