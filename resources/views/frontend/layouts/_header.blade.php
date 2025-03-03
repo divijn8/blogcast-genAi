@@ -1,4 +1,4 @@
-<header class="pt100 pb100 parallax-window-2" data-parallax="scroll" data-speed="0.5" data-image-src="frontend/assets/img/bg/img-bg-17.jpg" data-positiony="1000">
+<header class="pt100 pb100 parallax-window-2" data-parallax="scroll" data-speed="0.5" data-image-src="{{asset('frontend/assets/img/bg/img-bg-17.jpg')}}" data-positiony="1000">
     <div class="intro-body text-center">
         <div class="container">
             <div class="row">
