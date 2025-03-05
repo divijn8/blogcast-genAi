@@ -104,6 +104,9 @@
                             @error('body')
                             <span class="text-danger text-sm">{{ $message }}</span>
                             @enderror
+
+                            <!-- Loading message -->
+                            <span id="loadingMessage" class="text-warning text-sm" style="display: none;">Magic is happening ....Please wait....</span>
                         </div>
                         <div class="mb-3">
                             <label for="thumbnail" class="form-label">Thumbnail</label>
@@ -163,18 +166,60 @@
     <script>
         $('.select2').select2();
     </script>
+
+<script>
+    document.addEventListener('trix-attachment-add', function (evt) {
+        const attachment = evt.attachment;
+        uploadTrixImage(attachment);
+    });
+
+    function uploadTrixImage(attachment) {
+        const formData = new FormData();
+
+        formData.append('image', attachment.file);
+
+        fetch("{{ route('posts.uploadImage') }}", {
+            method: "POST",
+            headers: {
+                "X-CSRF-TOKEN": "{{ csrf_token() }}"
+            },
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data=> {
+            if(data.success) {
+                attachment.setAttributes({
+                    url: data.url,
+                    href: data.url
+                });
+            } else {
+                console.warn("Image Upload Failed!");
+
+            }
+        })
+        .catch(() => {
+            console.error("Some issue in fetch at server");
+        })
+    }
+</script>
+
     <script>
         function generateArticleFromAI(evt) {
+            const loadingMessage = "Magic is happening... Please wait...";
             const title = document.getElementById('title').value;
             const excerpt = document.getElementById('excerpt').value;
             const csrfToken = document.querySelector('meta[name="csrf-token"]').content;
+
+            document.querySelector('trix-editor').editor.setSelectedRange([0, 0]); // Place cursor at the beginning
+            document.querySelector('trix-editor').editor.insertString(loadingMessage);
 
             // if(!title || !excerpt) {
             //     alert("You need to fill title and excerpt for AI to generate the content.");
             //     return;
             // }
 
-            fetch('/api/posts/generate-ai', {
+            let userToken="{{auth()->user()->user_token}}";
+            fetch(`/api/posts/${userToken}/generate-ai`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

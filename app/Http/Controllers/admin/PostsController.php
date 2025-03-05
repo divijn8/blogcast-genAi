@@ -129,6 +129,19 @@ class PostsController extends Controller
             ->with('success', 'Post Deleted Successfully!');
     }
 
+    public function uploadImage(Request $request) {
+        if($request->hasFile('image')) {
+            $file = $request->file('image');
+            $path = $file->store('blog_image', 'public');
+
+            return response()->json([
+                'success' =>true,
+                'url'=> asset('storage/' .$path)
+            ]);
+        }
+
+        return response()->json(['success'=>false], 400);
+    }
 
     private function generatePrompt($title, $excerpt) {
         $prompt = <<<PROMPT
