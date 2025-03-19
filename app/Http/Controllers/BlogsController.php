@@ -70,4 +70,23 @@ class BlogsController extends Controller
             'tags'
         ]));
     }
+
+    public function showByTag(Request $request, $tagName) {
+        $tag = Tag::where('name', $tagName)->firstOrFail();
+
+        $tags = Tag::all();
+        $categories = Category::all();
+
+        $posts = Post::whereHas('tags', function ($query) use ($tag) {
+            $query->where('tags.name', $tag->name); 
+        })->with('author')->latest()->simplePaginate(9);
+
+        return view('frontend.tags', compact([
+            'tags',
+            'posts',
+            'categories',
+            'tag'
+        ]));
+    }
+
 }

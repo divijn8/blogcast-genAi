@@ -45,14 +45,9 @@
                         <span class="heading-divider mt10"></span>
                     </h5>
                     <ul class="tag">
-                        <li><a href="#">CS</a></li>
-                        <li><a href="#">Education</a></li>
-                        <li><a href="#">Coding</a></li>
-                        <li><a href="#">Engineering</a></li>
-                        <li><a href="#">Computers</a></li>
-                        <li><a href="#">Softwares</a></li>
-                        <li><a href="#">Programming</a></li>
+                        @foreach($tags as $tag)
+                            <li><a href="{{ route('frontend.showByTag', $tag->name) }}">{{ $tag->name }}</a></li>
+                        @endforeach
                     </ul>
-
                 </div>
             </div>

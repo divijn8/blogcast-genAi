@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', [\App\Http\Controllers\BlogsController::class, 'blogs'])->name('frontend.home');
 Route::get('/blogs/{slug}', [\App\Http\Controllers\BlogsController::class, 'show'])->name('frontend.show');
 Route::get('/blogs/categories/{category}', [\App\Http\Controllers\BlogsController::class, 'showByCategory'])->name('frontend.showByCategory');
+Route::get('/blogs/tags/{tag}', [\App\Http\Controllers\BlogsController::class, 'showByTag'])->name('frontend.showByTag');
 
 Route::prefix('admin')->name('admin.')->middleware(['auth'])->group(function () {
     //for tags
