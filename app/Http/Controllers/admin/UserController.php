@@ -129,7 +129,6 @@ class UserController extends Controller
         ->select('plans.articles_per_month')
         ->first();
 
-
         return view('admin.dashboard', compact('postCount', 'totalViewCount', 'articlesRemaining','subscriptionStatus','mostUsedCategories','mostUsedTags','subscriptionPlan','totalArticles'));
     }
 }

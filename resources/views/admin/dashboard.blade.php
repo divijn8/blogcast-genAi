@@ -107,42 +107,36 @@
 
     <!-- Content Row (Tags, Categories, Pie Chart) -->
     <div class="row">
-        <!-- Tags and Categories in one column -->
-        <div class="col-xl-8 col-lg-8 col-md-12 mb-4">
-            <div class="row">
-                <div class="col-md-6">
-                    <!-- Most Used Tags Card Example -->
-                    <div class="card shadow mb-4">
-                        <div class="card-header py-3">
-                            <h6 class="m-0 font-weight-bold text-primary">Most Used Tags</h6>
-                        </div>
-                        <div class="card-body">
-                            @foreach($mostUsedTags as $tag)
-                                <h4 class="small font-weight-bold">{{ $tag->name }}<span class="float-right">{{ $tag->count }}</span></h4>
-                            @endforeach
-                        </div>
-                    </div>
+        <div class="col-xl-4 col-lg-4 col-md-6 mb-4">
+            <!-- Most Used Tags Card Example -->
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">Most Used Tags</h6>
                 </div>
-
-                <div class="col-md-6">
-                    <!-- Most Used Categories Card Example -->
-                    <div class="card shadow mb-4">
-                        <div class="card-header py-3">
-                            <h6 class="m-0 font-weight-bold text-primary">Most Used Categories</h6>
-                        </div>
-                        <div class="card-body">
-                            @foreach($mostUsedCategories as $category)
-                                <h4 class="small font-weight-bold">{{ $category->name }}<span class="float-right">{{ $category->count }}</span></h4>
-                            @endforeach
-                        </div>
-                    </div>
+                <div class="card-body">
+                    @foreach($mostUsedTags as $tag)
+                        <h4 class="small font-weight-bold">{{ $tag->name }}<span class="float-right">{{ $tag->count }}</span></h4>
+                    @endforeach
                 </div>
             </div>
         </div>
 
-        <!-- Pie Chart in a separate column -->
+        <div class="col-xl-4 col-lg-4 col-md-6 mb-4">
+            <!-- Most Used Categories Card Example -->
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">Most Used Categories</h6>
+                </div>
+                <div class="card-body">
+                    @foreach($mostUsedCategories as $category)
+                        <h4 class="small font-weight-bold">{{ $category->name }}<span class="float-right">{{ $category->count }}</span></h4>
+                    @endforeach
+                </div>
+            </div>
+        </div>
+
         @if($subscriptionStatus == 'active')
-        <div class="col-xl-4 col-lg-4 col-md-12 mb-4">
+        <div class="col-xl-4 col-lg-4 col-md-6 mb-4">
             <!-- Pie Chart -->
             <div class="card shadow mb-4">
                 <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
@@ -165,6 +159,7 @@
         </div>
         @endif
     </div>
+
 @endsection
 
 @section('page-level-scripts')
