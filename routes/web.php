@@ -25,9 +25,9 @@ Route::prefix('admin')->name('admin.')->middleware(['auth'])->group(function () 
     Route::put('categories/{category}', [\App\Http\Controllers\admin\CategoriesController::class, 'update'])->name('categories.update');
     Route::delete('categories/{category}', [\App\Http\Controllers\admin\CategoriesController::class, 'destroy'])->name('categories.destroy');
 
-    Route::get('dashboard', function () {
-        return view('admin.dashboard');
-    })->name('dashboard');
+    Route::get('dashboard',
+        [\App\Http\Controllers\admin\UserController::class,'dashboard']
+    )->name('dashboard');
 });
 
 Route::middleware(['auth'])->group((function() {
