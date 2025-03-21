@@ -6,7 +6,6 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\CreatePostRequest;
 use App\Http\Requests\UpdatePostRequest;
 use App\Jobs\DispatchPostNotificationJob;
-use App\Mail\NewBlogNotification;
 use App\Models\Category;
 use App\Models\Post;
 use App\Models\Tag;
@@ -16,7 +15,6 @@ use GuzzleHttp\Client;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Storage;
 
 class PostsController extends Controller
@@ -195,8 +193,8 @@ PROMPT;
             $responseData = json_decode($response->getBody(), true);
             Log::info($responseData['candidates'][0]['content']['parts'][0]['text']);
 
-            if(!$user->canGenerateArticle()){
-                $user->actveSuscription()->decrement('articles_remaining');
+            if ($user->canGenerateArticle()) {
+                $user->activeSubscription()->decrement('articles_remaining');
             }
 
             $user->increment('articles_generated');
