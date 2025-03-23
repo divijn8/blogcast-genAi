@@ -157,8 +157,38 @@
                 </div>
             </div>
         </div>
-        @endif
     </div>
+    @else($subscriptionStatus == 'inactive')
+    <div class="col-xl-4 col-lg-4 col-md-6 mb-4">
+        <!-- Card for Inactive Subscription -->
+        <div class="card shadow mb-4">
+            <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                <h6 class="m-0 font-weight-bold text-danger">Inactive Subscription</h6>
+            </div>
+            <div class="card-body">
+                <!-- Message to show when the subscription is inactive -->
+                <p>Your subscription is inactive, and you have reached your article generation limit.</p>
+
+                <!-- Display Article Usage Information -->
+
+
+                <!-- Warning Message -->
+                @if($articlesRemaining < 0)
+                    <div class="alert alert-warning mt-3">
+                        <strong>Warning:</strong> You have <strong>{{ $articlesRemaining }}</strong> article generation(s) left. Kindly activate your subscription to get more article generations.
+                    </div>
+                @else
+                    <div class="alert alert-danger mt-3">
+                        <strong>Warning:</strong> You have reached your article generation limit. Kindly activate your subscription to get more article generations.
+                    </div>
+                @endif
+
+                <!-- Option to Renew Subscription -->
+                <a href="{{ route('subscriptions.index') }}" class="btn btn-primary mt-3">Activate Subscription</a>
+            </div>
+        </div>
+    </div>
+    @endif
 
 @endsection
 
@@ -167,11 +197,12 @@
     <script src="{{ asset('admin/vendor/chart.js/Chart.min.js') }}"></script>
 
     <!-- Page level custom scripts -->
-    {{-- <script>
+    <script>
         var articlesRemaining = {{ $articlesRemaining }};
-        var totalArticles = {{$totalArticles->articles_per_month}};
+        var totalArticles = {{ isset($totalArticles->articles_per_month) ? $totalArticles->articles_per_month : 3 }};
         var articlesUsed = totalArticles - articlesRemaining;
-    </script> --}}
+        console.log($articlesRemaining)
+    </script>
     <script src="{{ asset('admin/js/demo/chart-area-demo.js') }}"></script>
     <script src="{{ asset('admin/js/demo/chart-pie-demo.js') }}"></script>
 @endsection
