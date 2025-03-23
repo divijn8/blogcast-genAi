@@ -57,14 +57,14 @@
                                   </span>
 
                                     <span class="trix-button-group trix-button-group--block-tools" data-trix-button-group="block-tools">
-        <button type="button" class="trix-button trix-button--icon trix-button--icon-heading-1" data-trix-attribute="heading1" title="Heading 1" tabindex="-1">Heading 1</button>
-        <button type="button" class="trix-button trix-button--icon trix-button--icon-quote" data-trix-attribute="quote" title="Quote" tabindex="-1">Quote</button>
-        <button type="button" class="trix-button trix-button--icon trix-button--icon-code" data-trix-attribute="code" title="Code" tabindex="-1">Code</button>
-        <button type="button" class="trix-button trix-button--icon trix-button--icon-bullet-list" data-trix-attribute="bullet" title="Bullets" tabindex="-1">${lang.bullets}</button>
-        <button type="button" class="trix-button trix-button--icon trix-button--icon-number-list" data-trix-attribute="number" title="Numbering" tabindex="-1">Numbering</button>
-        <button type="button" class="trix-button trix-button--icon trix-button--icon-decrease-nesting-level" data-trix-action="decreaseNestingLevel" title="Outdent" tabindex="-1">Outdent</button>
-        <button type="button" class="trix-button trix-button--icon trix-button--icon-increase-nesting-level" data-trix-action="increaseNestingLevel" title="Indent" tabindex="-1">Indent</button>
-      </span>
+                                    <button type="button" class="trix-button trix-button--icon trix-button--icon-heading-1" data-trix-attribute="heading1" title="Heading 1" tabindex="-1">Heading 1</button>
+                                    <button type="button" class="trix-button trix-button--icon trix-button--icon-quote" data-trix-attribute="quote" title="Quote" tabindex="-1">Quote</button>
+                                    <button type="button" class="trix-button trix-button--icon trix-button--icon-code" data-trix-attribute="code" title="Code" tabindex="-1">Code</button>
+                                    <button type="button" class="trix-button trix-button--icon trix-button--icon-bullet-list" data-trix-attribute="bullet" title="Bullets" tabindex="-1">${lang.bullets}</button>
+                                    <button type="button" class="trix-button trix-button--icon trix-button--icon-number-list" data-trix-attribute="number" title="Numbering" tabindex="-1">Numbering</button>
+                                    <button type="button" class="trix-button trix-button--icon trix-button--icon-decrease-nesting-level" data-trix-action="decreaseNestingLevel" title="Outdent" tabindex="-1">Outdent</button>
+                                    <button type="button" class="trix-button trix-button--icon trix-button--icon-increase-nesting-level" data-trix-action="increaseNestingLevel" title="Indent" tabindex="-1">Indent</button>
+                                    </span>
 
                                     <span class="trix-button-group trix-button-group--file-tools" data-trix-button-group="file-tools">
                                         <button type="button" class="trix-button trix-button--icon trix-button--icon-attach" data-trix-action="attachFiles" title="Attach Files" tabindex="-1">Attach Files</button>
@@ -76,9 +76,9 @@
                                     <span class="trix-button-group-spacer"></span>
 
                                     <span class="trix-button-group trix-button-group--history-tools" data-trix-button-group="history-tools">
-        <button type="button" class="trix-button trix-button--icon trix-button--icon-undo" data-trix-action="undo" data-trix-key="z" title="Undo" tabindex="-1">Undo</button>
-        <button type="button" class="trix-button trix-button--icon trix-button--icon-redo" data-trix-action="redo" data-trix-key="shift+z" title="Redo" tabindex="-1">Redo</button>
-      </span>
+                                    <button type="button" class="trix-button trix-button--icon trix-button--icon-undo" data-trix-action="undo" data-trix-key="z" title="Undo" tabindex="-1">Undo</button>
+                                    <button type="button" class="trix-button trix-button--icon trix-button--icon-redo" data-trix-action="redo" data-trix-key="shift+z" title="Redo" tabindex="-1">Redo</button>
+                                    </span>
                                 </div>
 
                                 <div class="trix-dialogs" data-trix-dialogs>
@@ -105,8 +105,6 @@
                             <span class="text-danger text-sm">{{ $message }}</span>
                             @enderror
 
-                            <!-- Loading message -->
-                            <span id="loadingMessage" class="text-warning text-sm" style="display: none;">Magic is happening ....Please wait....</span>
                         </div>
                         <div class="mb-3">
                             <label for="thumbnail" class="form-label">Thumbnail</label>
@@ -157,6 +155,42 @@
             </div>
         </div>
     </div>
+    <!-- Loader HTML -->
+<div class="loader" id="loader" style="display: none;">
+    <div class="">Generating Magic With AI</div>
+    <div class="spinner"></div>
+</div>
+
+<style>
+    .loader {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(255, 255, 255, 0.7);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 9999;
+    }
+
+    .spinner {
+        border: 4px solid rgba(255, 255, 255, 0.3);
+        border-top: 4px solid #3498db;
+        border-radius: 50%;
+        width: 50px;
+        height: 50px;
+        animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+    
+</style>
+
 @endsection
 
 
@@ -205,13 +239,11 @@
 
     <script>
         function generateArticleFromAI(evt) {
-            const loadingMessage = "Magic is happening... Please wait...";
+
             const title = document.getElementById('title').value;
             const excerpt = document.getElementById('excerpt').value;
             const csrfToken = document.querySelector('meta[name="csrf-token"]').content;
 
-            document.querySelector('trix-editor').editor.setSelectedRange([0, 0]); // Place cursor at the beginning
-            document.querySelector('trix-editor').editor.insertString(loadingMessage);
 
             // if(!title || !excerpt) {
             //     alert("You need to fill title and excerpt for AI to generate the content.");
@@ -235,4 +267,26 @@
         }
         document.getElementById('generateArticleFromAI').addEventListener('click', generateArticleFromAI);
     </script>
+    <script>
+        // Get the loader and the "Generate Article With AI" button
+        const loader = document.getElementById('loader');
+        const generateArticleButton = document.getElementById('generateArticleFromAI');
+
+        // When the button is clicked, show the loader and simulate content generation
+        generateArticleButton.addEventListener('click', function() {
+            // Show loader
+            loader.style.display = 'flex';
+
+            // Simulate an AI content generation process (you can replace this with an actual AJAX request)
+            setTimeout(function() {
+                // Simulate AI-generated content being added to the editor
+                const editor = document.querySelector('trix-editor');
+                editor.editor.setSelectedRange([0, 0]); // Optional: place the cursor at the beginning
+
+                // Hide the loader once the content is ready
+                loader.style.display = 'none';
+            }, 3000); // Simulate a delay of 3 seconds for the AI content generation
+        });
+    </script>
+
 @endsection
