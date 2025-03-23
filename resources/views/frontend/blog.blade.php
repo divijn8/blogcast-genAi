@@ -37,4 +37,38 @@
         </p>
     </div>
 
+        {{--  Comments --}}
+
+        <div class="blog-post-comment-container">
+            <h5><i class="fa fa-comments-o mb25"></i> {{ $post->comments->count() }} Comments</h5>
+
+            {{-- Show top-level comments --}}
+            @include('frontend.partials.comments', ['comments' => $post->comments->whereNull('parent_id')])
+
+
+
+            {{-- Form to add a new comment --}}
+            <form action="{{ route('comments.store') }}" method="POST" class="mt-4">
+                @csrf
+                <input type="hidden" name="post_id" value="{{ $post->id }}">
+                <textarea name="content" class="form-control mb-2" rows="3" placeholder="Write a comment..." required></textarea>
+                <button type="submit" class="btn btn-success">Post Comment</button>
+            </form>
+
+            <button class="button button-default button-sm center-block button-block mt25 mb25">Load More Comments</button>
+        </div>
+
+        <script>
+            document.addEventListener('DOMContentLoaded', function () {
+                document.querySelectorAll('.reply-button').forEach(button => {
+                    button.addEventListener('click', function (e) {
+                        e.preventDefault();
+                        const commentId = this.dataset.commentId;
+                        const form = document.getElementById(`reply-form-${commentId}`);
+                        form.style.display = form.style.display === 'none' ? 'block' : 'none';
+                    });
+                });
+            });
+        </script>
+
 @endsection

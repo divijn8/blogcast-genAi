@@ -67,4 +67,9 @@ class User extends Authenticatable
         }
         return $this->activeSubscription()->articles_remaining > 0;
     }
+
+    public function posts()
+    {
+        return $this->hasMany(Post::class, 'author_id');
+    }
 }

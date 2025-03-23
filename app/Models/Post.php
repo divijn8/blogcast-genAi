@@ -39,4 +39,10 @@ class Post extends Model
     public function getUrlAttribute() {
         return asset("blogs/{$this->slug}");
     }
+
+
+    public function comments() {
+        return $this->hasMany(Comments::class)->with('user', 'replies');
+    }
+
 }

@@ -167,11 +167,11 @@
     <script src="{{ asset('admin/vendor/chart.js/Chart.min.js') }}"></script>
 
     <!-- Page level custom scripts -->
-    <script>
+    {{-- <script>
         var articlesRemaining = {{ $articlesRemaining }};
         var totalArticles = {{$totalArticles->articles_per_month}};
         var articlesUsed = totalArticles - articlesRemaining;
-    </script>
+    </script> --}}
     <script src="{{ asset('admin/js/demo/chart-area-demo.js') }}"></script>
     <script src="{{ asset('admin/js/demo/chart-pie-demo.js') }}"></script>
 @endsection
