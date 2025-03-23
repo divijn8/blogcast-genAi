@@ -96,12 +96,14 @@ class UserController extends Controller
 
         $articlesRemaining = $subscription ? $subscription->articles_remaining : '0';
         $subscriptionStatus = $subscription ? 'active' : 'inactive';
-
-        $subscriptionPlan = DB::table('subscriptions')
-                            ->join('plans', 'plans.id', '=', 'subscriptions.plan_id')
-                            ->where('subscriptions.id', $subscription->id)
-                            ->select('plans.name')
-                            ->first();
+        $subscriptionPlan = null;
+        if ($subscription) {
+            $subscriptionPlan = DB::table('subscriptions')
+                ->join('plans', 'plans.id', '=', 'subscriptions.plan_id')
+                ->where('subscriptions.id', $subscription->id)
+                ->select('plans.name')
+                ->first();
+        }
 
         $mostUsedTags= DB::table('post_tag')
                      ->join('tags', 'post_tag.tag_id', '=', 'tags.id')

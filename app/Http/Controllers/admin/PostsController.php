@@ -24,7 +24,8 @@ class PostsController extends Controller
      */
     public function index()
     {
-        $posts=Post::with('category')->with('tags')->latest()->paginate(20);
+        $user = auth()->user();
+        $posts=$user->posts()->with('category')->with('tags')->latest()->paginate(20);
         return view('admin.posts.index',compact([
             'posts'
         ]));
@@ -194,7 +195,10 @@ PROMPT;
             Log::info($responseData['candidates'][0]['content']['parts'][0]['text']);
 
             if ($user->canGenerateArticle()) {
-                $user->activeSubscription()->decrement('articles_remaining');
+                $activeSubscription = $user->activeSubscription();
+               if($activeSubscription) {
+                $activeSubscription->decrement('articles_remaining');
+               }
             }
 
             $user->increment('articles_generated');

@@ -32,7 +32,7 @@ class DispatchPostNotificationJob implements ShouldQueue
     {
         $post = Post::find($this->postId);
             if(!$post){
-                Log::error('Post not found not found in dispachpostnotificationjob'.$this->postId);
+                Log::error('Post not found in dispach post notification job'.$this->postId);
 
             return;
             }
