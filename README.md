@@ -1,66 +1,165 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# 📰 Blog Management System  
+**A scalable backend-driven blogging platform with AI-powered articles, user subscriptions, and queued email notifications.**  
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+---
 
-## About Laravel
+## 📌 Project Overview  
+This project is designed to handle **content creation, AI-generated articles, user subscriptions, and email notifications efficiently**. It follows a **scalable, maintainable backend architecture** using **queues, scheduled jobs, and API-based authentication**.  
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+> 🔹 **Why This Project?**  
+> - Demonstrates **scalable backend architectures**.  
+> - Uses **queues & workers** to efficiently process large-scale tasks.  
+> - Implements **RBAC (Role-Based Access Control)** for secure access.  
+> - Supports **REST API authentication with Laravel Sanctum**.  
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+---
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+## ⚙️ Features Implemented  
 
-## Learning Laravel
+| Feature | Backend Concept |
+|---------|---------------|
+| **Blog CRUD (Admin Panel)** | **MVC Architecture, Eloquent Relationships** |
+| **Rich Text Editor (Trix) with Image Uploads** | **File Handling & Storage Strategies** |
+| **Search & Filtering (Category, Tags, Title)** | **Indexing & Query Optimization** |
+| **View Count Tracking** | **Database Optimization** |
+| **Subscription-Based AI Article Limits** | **Role-Based Access, Monthly Reset Jobs** |
+| **Role-Based Access Control (RBAC)** | **Policies & Middleware** |
+| **Queued Email Notifications** | **Queue Workers & Job Processing** |
+| **Stripe Subscription Integration** | **API Payments (Without Webhooks)** |
+| **Scheduled Jobs for Subscription Resets** | **Laravel Task Scheduling, Cron Jobs** |
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+---
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+## 📂 Directory Structure  
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+```
+📦 Blog Management System
+ |-- 📂 app
+ |   |-- 📂 Console (Scheduled Jobs)
+ |   |-- 📂 Http
+ |   |   |-- 📂 Controllers
+ |   |   |-- 📂 Middleware
+ |   |   |-- 📂 Requests (Form Validation)
+ |   |-- 📂 Jobs (Queue-Based Processing)
+ |   |-- 📂 Mail (Custom Email Templates)
+ |   |-- 📂 Models
+ |-- 📂 database
+ |   |-- 📂 migrations (DB Schema)
+ |   |-- 📂 seeders (Demo Data)
+ |-- 📂 resources
+ |   |-- 📂 views (Admin Panel UI)
+ |   |-- 📂 emails (Newsletter Templates)
+ |-- 📂 routes
+ |   |-- web.php (Admin & Public)
+ |   |-- api.php (REST APIs)
+ |   |-- console.php (Task Scheduling)
+ |-- 📂 storage
+ |   |-- 📂 logs (Application Logs)
+ |-- 📜 .env (Environment Config)
+ |-- 📜 composer.json (Dependencies)
+ |-- 📜 README.md (Project Documentation)
 
-## Laravel Sponsors
+```
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+---
 
-### Premium Partners
+## 🚀 Backend Concepts & Implementation  
 
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[WebReinvent](https://webreinvent.com/)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel/)**
-- **[Cyber-Duck](https://cyber-duck.co.uk)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Jump24](https://jump24.co.uk)**
-- **[Redberry](https://redberry.international/laravel/)**
-- **[Active Logic](https://activelogic.com)**
-- **[byte5](https://byte5.de)**
-- **[OP.GG](https://op.gg)**
+### 1️⃣ **Queued Email Notifications**  
 
-## Contributing
+#### **Problem Statement**  
+- Sending **emails to thousands of subscribers** synchronously would slow down the system.  
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+#### **Solution**  
+- Implemented **Laravel Queues** to **offload email sending to background workers**.  
+- Job is triggered **only after the blog is fully stored**.  
 
-## Code of Conduct
+#### **Workflow**  
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+1️⃣ **Admin Publishes Blog** →  
+2️⃣ **`DispatchBlogNotificationJob` triggers** →  
+3️⃣ **Fetches subscribers in chunks (1000 at a time)** →  
+4️⃣ **`SendNewBlogNotificationJob` queues individual emails**  
+5️⃣ **Queue workers handle email sending asynchronously**  
 
-## Security Vulnerabilities
+```php
+public function store(BlogRequest $request)
+{
+    $blog = Blog::create($request->validated());
+    DispatchBlogNotificationJob::dispatch($blog->id);
+}
+```
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+### 2️⃣ **Monthly Subscription Reset via Scheduled Job**
+#### **Problem Statement**
+- Users should get new AI article limits every month based on their subscription plan.
+#### **Solution**
+- Laravel Task Scheduling runs on the last day of every month.
+- Free Users → Reset article count to 0.
+- Subscribed Users → Reset to plan-specific limits.
 
-## License
+```php
+Schedule::command('articles:reset')
+    ->when(fn() => now()->endOfMonth()->isToday())
+    ->dailyAt('00:00');
+```
+### 3️⃣ **Role-Based Access Control (RBAC)**
+#### **Problem Statement**
+- Only Admins should manage categories & tags.
+- Authors should only manage their own blogs.
+- Guests should only read blogs.
+#### **Solution**
+- Implemented Policies & Middleware to enforce permissions.
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+```php
+public function viewAny(User $user): bool
+{
+    return $user->role === 'admin';
+}
+```
+### 4️⃣ **AI-Generated Blog Management**
+#### **Problem Statement**
+- Users should be able to generate AI blogs based on their subscription (limits applied).
+#### **Solution**
+- Used REST API with Laravel Sanctum for authentication.
+- Enforced usage limits via middleware.
+
+```php
+if (!auth()->user()->canGenerateArticle()) {
+    return response()->json(['message' => 'AI quota exceeded'], 403);
+}
+```
+
+## 🔑 **Key Learnings**
+- **Queues →** Handling large-scale email sending efficiently.
+- **Task Scheduling →** Automating recurring backend tasks.
+- **Role-Based Authorization →** Restricting admin/author access.
+- **Database Optimization →** Handling large-scale blogs & subscribers efficiently.
+
+----
+## 🛠️ **Setup & Installation**
+### 🔹 Prerequisites
+- PHP 8.x
+- Laravel 11
+- Stripe API keys (for payments)
+### 🔹 Installation Steps
+```shell
+git clone https://github.com/your-repo/blog-management.git
+cd blog-management
+composer install
+cp .env.example .env
+php artisan key:generate
+php artisan migrate --seed
+php artisan queue:work
+php artisan serve
+```
+----
+## 📞 Contact
+- Git: https://gitlab.com/saachi_raheja
+- Email: raheja.saachi04114@gmail.com
+- LinkedIn: https://www.linkedin.com/in/saachi-raheja-8768572bb/
+
+---
+## ✅ Final Thoughts
+This project demonstrates scalable backend architecture with modern Laravel practices. It highlights the importance of background job processing, API security, task scheduling, and subscription management in a real-world SaaS application.
+
