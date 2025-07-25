@@ -4569,3 +4569,25 @@ ul.pagination.pagination-pasific li.active a {
     max-width: 1920px;
     background: transparent;
 }
+.depth-0 {
+    margin-left: 0;
+    border-left: none;
+}
+.depth-1 {
+    margin-left: 20px;
+    border-left: 2px solid #ddd;
+    padding-left: 10px;
+    background: #f9f9f9;
+}
+.depth-2 {
+    margin-left: 20px;
+    border-left: 2px solid #ccc;
+    padding-left: 10px;
+    background: #f0f0f0;
+}
+.mt-2{
+    margin-top: 1%;
+}
+.mb-2{
+    margin-bottom: 1%;
+}
