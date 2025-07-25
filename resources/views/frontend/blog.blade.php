@@ -55,7 +55,7 @@
                 <button type="submit" class="btn btn-success">Post Comment</button>
             </form>
 
-            <button class="button button-default button-sm center-block button-block mt25 mb25">Load More Comments</button>
+            <button class="button button-primary button-sm center-block button-block mt25 mb25">Load More Comments</button>
         </div>
 
         <script>
@@ -70,5 +70,25 @@
                 });
             });
         </script>
+        <script>
+            document.addEventListener('DOMContentLoaded', function () {
+    document.querySelectorAll('.toggle-replies-link').forEach(link => {
+        link.addEventListener('click', function (e) {
+            e.preventDefault();
+            const target = document.querySelector(this.dataset.target);
+            if (target.style.display === 'none') {
+                target.style.display = 'block';
+                this.textContent = 'Hide replies';
+            } else {
+                target.style.display = 'none';
+                this.textContent = this.getAttribute('data-original');
+            }
+        });
+        link.setAttribute('data-original', link.textContent);
+    });
+});
+
+</script>
+
 
 @endsection
