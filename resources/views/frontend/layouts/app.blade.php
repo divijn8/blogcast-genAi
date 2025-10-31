@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <title>Pen-It | Bloggers Heaven</title>
+    <title>BlogCast | Heaven for Creators</title>
     <meta name="description" content="">
     <meta name="keywords" content="">
     <meta charset="utf-8">
@@ -11,9 +11,9 @@
 
     <!-- Favicons -->
     <link rel="shortcut icon" href="{{ asset('frontend/assets/img/favicon.png') }}">
-    <link rel="apple-touch-icon" href="{{ asset('frontend/assets/img/apple-touch-icon.png') }}">
-    <link rel="apple-touch-icon" sizes="72x72" href="{{ asset('frontend/assets/img/apple-touch-icon-72x72.png') }}">
-    <link rel="apple-touch-icon" sizes="114x114" href="{{ asset('frontend/assets/img/apple-touch-icon-114x114.png') }}">
+    <link rel="apple-touch-icon" href="{{ asset('frontend/assets/img/favicon.png') }}">
+    <link rel="apple-touch-icon" sizes="72x72" href="{{ asset('frontend/assets/img/favicon.png') }}">
+    <link rel="apple-touch-icon" sizes="114x114" href="{{ asset('frontend/assets/img/favicon.png') }}">
 
     <!-- Load Core CSS
     =====================================-->
