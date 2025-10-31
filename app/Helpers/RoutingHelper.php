@@ -41,7 +41,7 @@ class RoutingHelper
     }
 
     public static function isPostRoute() {
-        return self::isPostEdit() || self::isPostCreate() || self::isPostIndex();
+        return self::isPostEdit() || self::isPostCreate() || self::isPostIndex() || self::isPostDraft();
     }
 
     public static function isPostCreate() {
@@ -54,5 +54,9 @@ class RoutingHelper
 
     public static function isPostEdit() {
         return Route::is(['admin.posts.edit']);
+    }
+
+    public static function isPostDraft() {
+        return Route::is(['admin.posts.draft']);
     }
 }

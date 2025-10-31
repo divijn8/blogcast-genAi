@@ -1,13 +1,13 @@
 @extends('admin.layouts.app')
 
-@section('title',"Pen It - Posts")
+@section('title',"BlogCast - Blogs")
 
 @section('main-content')
     <!-- Page Heading -->
 <div class="d-sm-flex align-items-center justify-content-between mb-4">
-    <h1 class="h3 mb-0 text-gray-800">Posts</h1>
+    <h1 class="h3 mb-0 text-gray-800">Blogs</h1>
     <a href={{ route('admin.posts.create') }} class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm"><i
-            class="fas fa-cog fa-sm text-white-50"></i> Create Post</a>
+            class="fas fa-cog fa-sm text-white-50"></i> Create Blog</a>
 </div>
 @include('admin.layouts._alerts')
 <div class="card">

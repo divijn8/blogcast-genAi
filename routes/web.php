@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\BlogsController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
@@ -16,6 +17,10 @@ Route::prefix('admin')->name('admin.')->middleware(['auth'])->group(function () 
     Route::resource('posts', \App\Http\Controllers\admin\PostsController::class);
     //for users
     Route::resource('users',\App\Http\Controllers\admin\UserController::class);
+
+    Route::get('/blogs/drafts', [BlogsController::class, 'draft'])->name('posts.draft');
+
+    Route::put('/blogs/{blog}/publish',[BlogsController::class, 'publishBlog'])->name('posts.publish');
 
     //for categories
     Route::get('categories', [\App\Http\Controllers\admin\CategoriesController::class, 'index'])->name('categories.index');

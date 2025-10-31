@@ -6,7 +6,7 @@
                 <div class="sidebar-brand-icon rotate-n-15">
                     <i class="fas fa-laugh-wink"></i>
                 </div>
-                <div class="sidebar-brand-text mx-3">Pen It</div>
+                <div class="sidebar-brand-text mx-3">BlogCast</div>
             </a>
 
             <!-- Divider -->
@@ -64,13 +64,14 @@
                 <a class="nav-link {{ \App\Helpers\RoutingHelper::isPostRoute() ? '' : 'collapsed' }}" href="#" data-toggle="collapse" data-target="#collapsePost"
                 aria-expanded="true" aria-controls="collapsePost">
                     <i class="fas fa-fw fa-cog"></i>
-                    <span>Post</span>
+                    <span>Blog</span>
                 </a>
                 <div id="collapsePost" class="collapse {{ \App\Helpers\RoutingHelper::isPostRoute() ? 'show' : '' }}" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
                     <div class="bg-white py-2 collapse-inner rounded">
-                        <h6 class="collapse-header">Post Operations:</h6>
+                        <h6 class="collapse-header">Blogs Operations:</h6>
                         <a class="collapse-item {{ \App\Helpers\RoutingHelper::isPostIndex() ? 'active' : '' }}" href="{{ route('admin.posts.index') }}">Show All</a>
-                        <a class="collapse-item {{ \App\Helpers\RoutingHelper::isPostCreate() ? 'active' : '' }}" href="{{ route('admin.posts.create') }}">Create Post</a>
+                        <a class="collapse-item {{ \App\Helpers\RoutingHelper::isPostCreate() ? 'active' : '' }}" href="{{ route('admin.posts.create') }}">Create Blogs</a>
+                        <a class="collapse-item {{ \App\Helpers\RoutingHelper::isPostDraft() ? 'active' : '' }}" href="{{ route('admin.posts.draft') }}">Drafts</a>
                     </div>
                 </div>
             </li>

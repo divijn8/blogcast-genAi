@@ -18,6 +18,7 @@ return new class extends Migration
             $table->longText('body');
             $table->unsignedBigInteger('category_id');
             $table->string('thumbnail',1000);
+            $table->timestamp('published_at')->nullable();
             $table->timestamps();
 
             $table->foreign('category_id')

@@ -25,7 +25,7 @@ class CreatePostRequest extends FormRequest
             'title' => 'required|string|max:255|unique:posts,title,'.$this->post?->id,
             'excerpt' => 'required|string|max:1000',
             'body' => 'required',
-            'thumbnail' => 'image|mimes:jpg,jpeg,png|max:2048',
+            'thumbnail' => 'required|image|mimes:jpg,jpeg,png|max:2048',
             'category_id' => 'required|exists:categories,id',
             'tags' => 'array|required',
             'tags.*' => 'exists:tags,id'

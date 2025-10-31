@@ -143,27 +143,33 @@ class PostsController extends Controller
     }
 
     private function generatePrompt($title, $excerpt) {
-        $prompt = <<<PROMPT
-You are a professional content writer and I want you to generate an HTML blog article with the following specifications:
+    $prompt = <<<PROMPT
+You are a friendly and creative blog writer. Write a **simple, clear, and engaging HTML blog article** based on the following details:
 
-Title: $title
-
-Excerpt: $excerpt
+Title: "$title"
+Excerpt: "$excerpt"
 
 Instructions:
-* Write the article in a conversational and engaging tone.
-* Do not include excerpt and title in the article that you write.
-* Use appropriate HTML tags for structure such as as <p>, <h2>, <h3>, <ul>, <li>, <code>, <blockquote> and so on.
-* Include atleast 4 headings to break the contents, and they all should be wrapped in h3 tag.
-* Ensure the HTML code is valid and well formatted.
-* Do not include any CSS styling.
-* Do not include any JavaScript
-* Focus on providing information closely related to the given title and excerpt.
-* If applicable, include the summary or conclusion at the end of article, whose title should be wrapped in h4 tag.
+* Write in a natural, easy-to-read tone — like telling a story to a friend.
+* Use **simple words and short sentences**. Avoid complex or formal vocabulary.
+* Do **not** include the title or excerpt in the article body.
+* Keep the article lively, relatable, and interesting — readers should enjoy reading it till the end.
+* Use proper HTML structure:
+  - Wrap main sections in `<h3>` tags (at least 4 of them).
+  - Use `<p>` for paragraphs, `<ul>` and `<li>` for lists when needed.
+  - Avoid Markdown code blocks (no ```html).
+  - Do **not** include any CSS or JavaScript.
+* Start with a short, catchy introduction that connects with the reader emotionally.
+* Focus closely on the given title and excerpt theme.
+* End with a short summary or reflection inside an `<h4>` tag.
+
+Keep the tone **friendly, conversational, and positive**.
 PROMPT;
 
-        return $prompt;
-    }
+    return $prompt;
+}
+
+
     public function generateAI(Request $request,$token) {
         $user = User::where('user_token',$token)->firstOrFail();
         if(!$user->canGenerateArticle()){
@@ -202,7 +208,17 @@ PROMPT;
             }
 
             $user->increment('articles_generated');
-            return response()->json(['content'=>$responseData['candidates'][0]['content']['parts'][0]['text'], 'status'=>200]);
+            $content = $responseData['candidates'][0]['content']['parts'][0]['text'] ?? '';
+
+            // Remove code fences like ```html or ```
+            $content = preg_replace('/^```(?:html)?\s*/i', '', $content);
+            $content = preg_replace('/```$/', '', $content);
+
+            // Trim whitespace just in case
+            $content = trim($content);
+
+            return response()->json(['content' => $content, 'status' => 200]);
+
         }
 
         return response()->json(['content'=>'You have reached ur limit','status'=>403]);

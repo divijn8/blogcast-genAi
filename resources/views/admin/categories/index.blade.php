@@ -1,6 +1,6 @@
 @extends('admin.layouts.app')
 
-@section('title',"Pen It - Categories")
+@section('title',"BlogCast - Categories")
 
 @section('main-content')
     <!-- Page Heading -->

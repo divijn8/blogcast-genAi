@@ -7,7 +7,8 @@
     <meta name="description" content="">
     <meta name="author" content="">
 
-    <title>@yield('title', "Pen It - Admin Panel")</title>
+    <title>@yield('title', "BlogCast - Admin Panel")</title>
+    <link rel="shortcut icon" href="{{ asset('frontend/assets/img/favicon.png') }}">
 
     <!-- Custom fonts for this template-->
     <link href="{{ asset('admin/vendor/fontawesome-free/css/all.min.css') }}" rel="stylesheet" type="text/css">

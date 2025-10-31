@@ -149,6 +149,21 @@
                             @enderror
                         </div>
 
+                        <!-- Draft checkbox (aligned right) -->
+                        <div class="form-group d-flex mt-3 mb-4">
+                            <div class="form-check">
+                                <input
+                                    type="checkbox"
+                                    class="form-check-input"
+                                    id="draft"
+                                    name="draft"
+                                    {{ old('draft') ? 'checked' : '' }}
+                                >
+                                <label class="form-check-label ms-1" for="draft">Save as Draft</label>
+                            </div>
+                        </div>
+
+
                         <input type="submit" class="btn btn-outline-primary" value="Create Post">
                     </form>
                 </div>
@@ -188,7 +203,7 @@
         0% { transform: rotate(0deg); }
         100% { transform: rotate(360deg); }
     }
-    
+
 </style>
 
 @endsection
