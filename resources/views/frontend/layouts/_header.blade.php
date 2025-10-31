@@ -4,8 +4,8 @@
             <div class="row">
                 <div class="col-md-12 pt50">
                     <h1 class="brand-heading font-montserrat text-uppercase color-light" data-in-effect="fadeInDown">
-                        Pen-It
-                        <small class="color-light alpha7">Heaven for Bloggers!</small>
+                        BlogCast
+                        <small class="color-light alpha7">Heaven for Creators</small>
                     </h1>
                 </div>
             </div>
