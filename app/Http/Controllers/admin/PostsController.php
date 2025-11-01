@@ -60,7 +60,7 @@ class PostsController extends Controller
             }
 
             $data['author_id']= auth()->id();
-            $data['published_at'] = Carbon::now();
+
             $post=Post::create($data);
             $post->tags()->attach($request->tags);
 

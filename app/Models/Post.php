@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
@@ -45,4 +46,15 @@ class Post extends Model
         return $this->hasMany(Comments::class)->with('user', 'replies');
     }
 
+    public function scopePublished($query) {
+        return $query->where('published_at', '<=', now('Asia/Kolkata'));
+    }
+
+    public function scopeSearch($query) {
+        $searchParam = request()->search;
+        if($searchParam) {
+            $query = $query->where('title', 'like', "%$searchParam%");
+        }
+        return $query;
+    }
 }

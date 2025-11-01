@@ -18,7 +18,7 @@ class BlogsController extends Controller
         $tags = Tag::all();
 
         // Only fetch drafts for authenticated users
-        $query = Post::with('author')->latest();
+        $query = Post::with('author')->latest() ;
 
         // Apply search if there is one
         if ($search) {
@@ -33,7 +33,8 @@ class BlogsController extends Controller
         }
 
         // Paginate the results
-        $posts = $query->simplePaginate(9);
+        $posts = $query->published()
+            ->orderBy('published_at', 'desc')->simplePaginate(9);
 
         return view('frontend.home', compact([
             'posts',

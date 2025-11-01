@@ -1,6 +1,7 @@
 @extends('admin.layouts.app')
 
 @section('page-level-styles')
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
     <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
     <link rel="stylesheet" type="text/css" href="https://unpkg.com/trix@2.0.8/dist/trix.css">
 
@@ -9,6 +10,35 @@
             border: solid 1px red;
         }
     </style>
+    <style>
+    .loader {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(255, 255, 255, 0.7);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 9999;
+    }
+
+    .spinner {
+        border: 4px solid rgba(255, 255, 255, 0.3);
+        border-top: 4px solid #3498db;
+        border-radius: 50%;
+        width: 50px;
+        height: 50px;
+        animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+
+</style>
 @endsection
 
 
@@ -149,6 +179,20 @@
                             @enderror
                         </div>
 
+                        <div class="form-group">
+                                <label for="published_at" class="form-label">Published At</label>
+                                <input type="date"
+                                    class="form-control @error('published_at') border-danger text-danger
+                            @enderror"
+                                    placeholder="Enter Published Date" id="published_at" name="published_at"
+                                    value="{{ old('published_at') }}">
+                                @error('published_at')
+                                    <span class="text-danger">
+                                        {{ $message }}
+                                    </span>
+                                @enderror
+                            </div>
+
                         <!-- Draft checkbox (aligned right) -->
                         <div class="form-group d-flex mt-3 mb-4">
                             <div class="form-check">
@@ -176,44 +220,24 @@
     <div class="spinner"></div>
 </div>
 
-<style>
-    .loader {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: rgba(255, 255, 255, 0.7);
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        z-index: 9999;
-    }
 
-    .spinner {
-        border: 4px solid rgba(255, 255, 255, 0.3);
-        border-top: 4px solid #3498db;
-        border-radius: 50%;
-        width: 50px;
-        height: 50px;
-        animation: spin 1s linear infinite;
-    }
-
-    @keyframes spin {
-        0% { transform: rotate(0deg); }
-        100% { transform: rotate(360deg); }
-    }
-
-</style>
 
 @endsection
 
 
 @section('page-level-scripts')
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
     <script type="text/javascript" src="https://unpkg.com/trix@2.0.8/dist/trix.umd.min.js"></script>
     <script>
         $('.select2').select2();
+
+        flatpickr("#published_at", {
+            enableTime: true,
+            altInput: true,
+            altFormat: "F j, Y H:i",
+            dateFormat: "Y-m-d H:i",
+        });
     </script>
 
 <script>

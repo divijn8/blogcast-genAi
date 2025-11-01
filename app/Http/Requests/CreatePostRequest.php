@@ -28,7 +28,8 @@ class CreatePostRequest extends FormRequest
             'thumbnail' => 'required|image|mimes:jpg,jpeg,png|max:2048',
             'category_id' => 'required|exists:categories,id',
             'tags' => 'array|required',
-            'tags.*' => 'exists:tags,id'
+            'tags.*' => 'exists:tags,id',
+            'published_at' => 'nullable|date',
         ];
     }
 }
