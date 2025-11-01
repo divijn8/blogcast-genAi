@@ -300,7 +300,7 @@
 
                 // Hide the loader once the content is ready
                 loader.style.display = 'none';
-            }, 3000); // Simulate a delay of 3 seconds for the AI content generation
+            }, 4000); // Simulate a delay of 3 seconds for the AI content generation
         });
     </script>
 

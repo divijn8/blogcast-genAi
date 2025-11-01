@@ -10,7 +10,7 @@ class Post extends Model
 {
     use HasFactory;
 
-    protected $fillable=['title','slug','excerpt','author_id','body','thumbnail','category_id'];
+    protected $fillable=['title','slug','excerpt','author_id','body','thumbnail','category_id', 'published_at'];
 
      // Accessors:for consistent and customized data presentation.
      public function getThumbnailPathAttribute() {

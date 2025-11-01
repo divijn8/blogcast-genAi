@@ -10,6 +10,7 @@ use App\Models\Category;
 use App\Models\Post;
 use App\Models\Tag;
 use App\Models\User;
+use Carbon\Carbon;
 use GuzzleHttp\Client;
 
 use Illuminate\Http\Request;
@@ -59,6 +60,7 @@ class PostsController extends Controller
             }
 
             $data['author_id']= auth()->id();
+            $data['published_at'] = Carbon::now();
             $post=Post::create($data);
             $post->tags()->attach($request->tags);
 
@@ -66,7 +68,7 @@ class PostsController extends Controller
 
             DispatchPostNotificationJob::dispatch($post->id);
             return redirect()->route('admin.posts.index')
-                             ->with('success','Post created successfully');
+                             ->with('success','Post created successfully!');
         }catch(\Exception $e) {
             DB::rollBack();
             Log::error($e);
