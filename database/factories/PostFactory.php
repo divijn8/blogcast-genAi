@@ -3,6 +3,7 @@
 namespace Database\Factories;
 
 use App\Models\Category;
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -22,7 +23,8 @@ class PostFactory extends Factory
             'excerpt' => fake()->paragraph,
             'body' => fake()->paragraphs(random_int(5, 8), true),
             'category_id' => Category::all('id')->random()->id,
-            'thumbnail' => 'thumbnails/' . random_int(1, 35) . ".jpg"
+            'thumbnail' => 'thumbnails/' . random_int(1, 35) . ".jpg",
+            'published_at' => Carbon::now(),
         ];
     }
 }
