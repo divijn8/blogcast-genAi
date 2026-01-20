@@ -1,5 +1,11 @@
 @extends('frontend.layouts.app')
 
+@php
+    $postUrl = urlencode(route('frontend.show', $post->slug));
+    $postTitle = urlencode($post->title);
+@endphp
+
+
 @section('main-content')
     <div class="blog-three-mini">
         <h2 class="color-dark">
@@ -11,11 +17,29 @@
             <div><i class="fa fa-eye"></i>{{ $post->view_count }}</div> |
             <div><a href="#comment"><i class="fa fa-comment-o"></i>{{ $post->comments->count() }}</a></div> |
             <div>
-                Share:  <a href="#"><i class="fa fa-facebook-official"></i></a>
-                <a href="#"><i class="fa fa-twitter"></i></a>
-                <a href="#"><i class="fa fa-linkedin"></i></a>
-                <a href="#"><i class="fa fa-google-plus"></i></a>
-                <a href="#"><i class="fa fa-pinterest"></i></a>
+                <div>
+                    Share:
+                    <a href="https://www.facebook.com/sharer/sharer.php?u={{ $postUrl }}"
+                    target="_blank">
+                        <i class="fa fa-facebook-official"></i>
+                    </a>
+
+                    <a href="https://twitter.com/intent/tweet?url={{ $postUrl }}&text={{ $postTitle }}"
+                    target="_blank">
+                        <i class="fa fa-twitter"></i>
+                    </a>
+
+                    <a href="https://www.linkedin.com/sharing/share-offsite/?url={{ $postUrl }}"
+                    target="_blank">
+                        <i class="fa fa-linkedin"></i>
+                    </a>
+
+                    <a href="https://pinterest.com/pin/create/button/?url={{ $postUrl }}&description={{ $postTitle }}"
+                    target="_blank">
+                        <i class="fa fa-pinterest"></i>
+                    </a>
+                </div>
+
             </div>
         </div>
 
