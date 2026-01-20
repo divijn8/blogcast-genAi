@@ -117,7 +117,7 @@ class UserController extends Controller
 
         $mostUsedCategories= DB::table('posts')
                      ->where('posts.author_id',$userId)
-                     ->join('categories', 'posts.category_id', '=', 'category_id')
+                     ->join('categories', 'posts.category_id', '=', 'categories.id')
                      ->select('categories.name', DB::raw('count(*) as count'))
                      ->groupBy('categories.name')
                      ->orderByDesc('count')
