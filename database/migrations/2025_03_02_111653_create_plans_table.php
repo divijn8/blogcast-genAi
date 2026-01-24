@@ -23,10 +23,10 @@ return new class extends Migration
             $table->timestamps();
         });
         $plans=collect([
-            ['name'=>'Basic Monthly Plan','stripe_plan_id'=>'prod_Rru7tKR5Q3MS1C','interval'=>'monthly','price'=>10,'articles_per_month'=>100,'stripe_price_id'=>'price_1QyAJeQo3wFOzvgvjXu9kAXF'],
-            ['name'=>'Pro Monthly Plan(10% Off)','stripe_plan_id'=>'prod_RruBXDCEmCIicX','interval'=>'monthly','price'=>29,'articles_per_month'=>500,'stripe_price_id'=>'price_1QyAMwQo3wFOzvgv25xn4TcQ'],
-            ['name'=>'Basic Yearly Plan','stripe_plan_id'=>'prod_RruAOIK9j8Zzem','interval'=>'yearly','price'=>108,'articles_per_month'=>1200,'stripe_price_id'=>'price_1QyALyQo3wFOzvgvYAs6iAlb'],
-            ['name'=>'Pro Yearly Plan(10% Off)','stripe_plan_id'=>'prod_RruCWQy8o4vUJZ','interval'=>'yearly','price'=>313,'articles_per_month'=>6000,'stripe_price_id'=>'price_1QyAO0Qo3wFOzvgvN8W3eY50']
+            ['name'=>'Basic Monthly Plan','stripe_plan_id'=>'prod_Tqo9pnnm3FNMLS','interval'=>'monthly','price'=>10,'articles_per_month'=>100,'stripe_price_id'=>'price_1St6XbAcTvZ5kp0YvSiUn3oL'],
+            ['name'=>'Pro Monthly Plan(10% Off)','stripe_plan_id'=>'prod_TqoCO9S03Tspqv','interval'=>'monthly','price'=>29,'articles_per_month'=>500,'stripe_price_id'=>'price_1St6aSAcTvZ5kp0YGG4rYRlg'],
+            ['name'=>'Basic Yearly Plan','stripe_plan_id'=>'prod_TqoDvxARFk9pf9','interval'=>'yearly','price'=>108,'articles_per_month'=>1200,'stripe_price_id'=>'price_1St6bIAcTvZ5kp0YrnsFPvtk'],
+            ['name'=>'Pro Yearly Plan(10% Off)','stripe_plan_id'=>'prod_TqoFozKKjUyRGf','interval'=>'yearly','price'=>313,'articles_per_month'=>6000,'stripe_price_id'=>'price_1St6cjAcTvZ5kp0YdYQ0dTwd']
         ]);
 
         $plans->each(function($plan) {
