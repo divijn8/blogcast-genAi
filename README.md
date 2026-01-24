@@ -154,12 +154,6 @@ php artisan queue:work
 php artisan serve
 ```
 ----
-## 📞 Contact
-- Git: https://gitlab.com/saachi_raheja
-- Email: raheja.saachi04114@gmail.com
-- LinkedIn: https://www.linkedin.com/in/saachi-raheja-8768572bb/
-
----
 ## ✅ Final Thoughts
 This project demonstrates scalable backend architecture with modern Laravel practices. It highlights the importance of background job processing, API security, task scheduling, and subscription management in a real-world SaaS application.
 
