@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\BlogsController;
+use App\Http\Controllers\CommentController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
@@ -30,6 +31,11 @@ Route::prefix('admin')->name('admin.')->middleware(['auth'])->group(function () 
     Route::put('categories/{category}', [\App\Http\Controllers\admin\CategoriesController::class, 'update'])->name('categories.update');
     Route::delete('categories/{category}', [\App\Http\Controllers\admin\CategoriesController::class, 'destroy'])->name('categories.destroy');
 
+    Route::get('/comments', [CommentController::class, 'index'])->name('comments.index');
+
+    Route::put('/comments/{comment}/approve',[CommentController::class, 'approve'])->name('comments.approve');
+    Route::put('/comments/{comment}/unapprove',[CommentController::class, 'unapprove'])->name('comments.unapprove');
+
     Route::get('dashboard',
         [\App\Http\Controllers\admin\UserController::class,'dashboard']
     )->name('dashboard');
@@ -44,8 +50,7 @@ Route::middleware(['auth'])->group((function() {
     Route::get('/subscriptions/cancel',[\App\Http\Controllers\admin\SubscriptionController::class,'cancel'])->name('subscription.cancel');
 }));
 
+Route::post('/posts/{post}/comments', [App\Http\Controllers\CommentController::class, 'store'])->name('comments.store');
 
 Auth::routes();
-
-Route::post('/comments', [App\Http\Controllers\CommentController::class, 'store'])->name('comments.store')->middleware('auth');
 

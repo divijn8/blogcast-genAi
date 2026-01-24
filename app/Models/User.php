@@ -21,6 +21,7 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'role',
         'user_token'
     ];
 
@@ -72,4 +73,35 @@ class User extends Authenticatable
     {
         return $this->hasMany(Post::class, 'author_id');
     }
+
+    public function isAdmin(): bool
+    {
+        return $this->role === "admin";
+    }
+
+    public function isOwner(Post $post): bool
+    {
+        return $this->id === $post->user_id;
+    }
+
+    public function comments()
+    {
+        return $this->hasMany(Comments::class);
+    }
+
+    public function scopeAdmin($query)
+    {
+        return $query->where('id', '!=', auth()->user()->id);
+    }
+
+    public function scopeEmailVerified($query)
+    {
+        return $query->where('email_verified_at', '!=', NULL);
+    }
+
+    public function scopeEmailNotVerified($query)
+    {
+        return $query->where('email_verified_at', NULL);
+    }
+
 }

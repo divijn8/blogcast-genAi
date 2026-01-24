@@ -69,18 +69,20 @@
             {{-- Show top-level comments --}}
             @include('frontend.partials.comments', ['comments' => $post->comments->whereNull('parent_id')])
 
-
-
-            {{-- Form to add a new comment --}}
-            <form action="{{ route('comments.store') }}" method="POST" class="mt-4">
+            <form action="{{ route('comments.store', $post->id) }}" method="POST">
                 @csrf
-                <input type="hidden" name="post_id" value="{{ $post->id }}">
-                <textarea name="content" class="form-control mb-2" rows="3" placeholder="Write a comment..." required></textarea>
-                <button type="submit" class="btn btn-success">Post Comment</button>
-            </form>
+                @guest
+                    <div class="row" style="margin: 10px">
+                        <input type="text" name="name" class="col-md-6 blog-leave-comment-input" placeholder="name" style="margin-left: -10px; margin-right: 10px">
+                        <input type="email" name="email" class="col-md-6 blog-leave-comment-input" placeholder="email">
+                    </div>
+                @endguest
+                <textarea name="content" class="form-control mb-2" rows="5"  placeholder="Write a comment..." class="blog-leave-comment-textarea"></textarea>
 
-            {{-- <button class="button button-primary button-sm center-block button-block mt25 mb25">Load More Comments</button> --}}
+                <button type="submit" class="button button-pasific button-sm center-block mb25">Leave Comment</button>
+            </form>
         </div>
+
 
         <script>
             document.addEventListener('DOMContentLoaded', function () {

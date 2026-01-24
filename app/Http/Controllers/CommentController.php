@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\CreateCommentsRequest;
 use App\Models\Comments;
+use App\Models\Post;
 use Illuminate\Http\Request;
 
 class CommentController extends Controller
@@ -10,46 +12,23 @@ class CommentController extends Controller
 
     public function index()
     {
-        if(auth()->user()->isAdmin()) {
-            $comments = Comments::with('blog')->latest()->paginate(10);
-        }
-
+        $comments = Comments::with('posts')->latest()->get();
         return view('admin.comments.index', compact(['comments']));
     }
 
-    public function store(Request $request){
-        $this->validate($request,[
-            'content'=>'required|string|min:2|max:1000',
-            'post_id'=>'required|exists:posts,id',
-            'parent_id'=>'nullable|exists:comments,id'
-        ]);
-
-        Comments::create([
-            'content'=>$request->content,
-            'post_id'=>$request->post_id,
-            'user_id'=>auth()->id(),
-            'parent_id'=>$request->parent_id,
-        ]);
-
-        return redirect()->back();
-    }
-
-    public function store(Request $request)
+    public function store(CreateCommentsRequest $request, int $id)
     {
-        $this->validate($request,[
-            'content'=>'required|string|min:2|max:1000',
-            'post_id'=>'required|exists:posts,id',
-            'parent_id'=>'nullable|exists:comments,id'
-        ]);
+        $blog = Post::findOrFail($id);
 
         $commentData = [
-            'post_id' => $request->post_id,
-            'content' => $request->comment,
+            'post_id' => $id,
+            'content' => $request->content,
+            'parent_id' => $request->parent_id
         ];
 
         if (auth()->check()) {
             $commentData = array_merge([
-                'commented_by' => auth()->id(),
+                'user_id' => auth()->id(),
             ], $commentData);
 
             if (auth()->user()->isAdmin() || auth()->user()->isOwner($blog)) {
@@ -66,5 +45,27 @@ class CommentController extends Controller
 
             session()->flash('success', 'Comment will be added once approved!');
         }
+
+        Comments::create($commentData);
+        return redirect()->back();
     }
+
+    public function approve(Comments $comment)
+    {
+        $comment->approved_by = auth()->id();
+        $comment->save();
+
+        session()->flash('success', 'Comment approved...');
+        return redirect(route('admin.blogs.comments'));
+    }
+
+    public function unapprove(Comments $comment)
+    {
+        $comment->approved_by = null;
+        $comment->save();
+
+        session()->flash('error', 'Comment Unapproved...');
+        return redirect(route('admin.blogs.comments'));
+    }
+
 }

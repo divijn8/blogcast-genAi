@@ -62,8 +62,8 @@
     </li>
 
     <!-- Comments -->
-    <li class="nav-item">
-        <a class="nav-link" href="#">
+    <li class="nav-item {{ request()->routeIs('admin.comments.*') ? 'active' : '' }}">
+        <a class="nav-link" href="{{ route('admin.comments.index') }}">
             <i class="fas fa-fw fa-comments"></i>
             <span>Comments</span>
         </a>
