@@ -9,3 +9,9 @@
     {{session('error')}}
 </div>
 @endif
+
+@if (session()->has('warning'))
+<div class="alert alert-warning fade show">
+    {{session('warning')}}
+</div>
+@endif
