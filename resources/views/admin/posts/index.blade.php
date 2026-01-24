@@ -1,13 +1,13 @@
 @extends('admin.layouts.app')
 
-@section('title',"BlogCast - Blogs")
+@section('title',"BlogCast - All Blogs")
 
 @section('main-content')
     <!-- Page Heading -->
 <div class="d-sm-flex align-items-center justify-content-between mb-4">
     <h1 class="h3 mb-0 text-gray-800">Blogs</h1>
-    <a href={{ route('admin.posts.create') }} class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm"><i
-            class="fas fa-cog fa-sm text-white-50"></i> Create Blog</a>
+    <a href={{ route('admin.posts.create') }} class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm">
+            <i class="fas fa-pen fa-sm text-white-50"></i> Add New Blog</a>
 </div>
 @include('admin.layouts._alerts')
 <div class="card">
@@ -28,7 +28,7 @@
                                 <tr>
                                     <td>{{ $post->id }}</td>
                                     <td width="20%">
-                                        <img src="{{env('APP_URL')}}/storage/{{ $post->thumbnail }}" alt="{{ $post->title }}" class="img-fluid">
+                                        <img src="{{ asset($post->thumbnail_path) }}" alt="{{ $post->title }}" class="img-fluid">
                                     </td>
                                     <td>{{ $post->title }}</td>
                                     <td>{{ $post->category->name }}</td>
