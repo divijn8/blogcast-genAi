@@ -16,7 +16,10 @@
 
             <ul class="nav navbar-nav">
                 <li>
-                    <a href="/" data-toggle="dropdown" class="dropdown-toggle color-light">Home </a>
+                    <a href="{{ route('frontend.home') }}">Home </a>
+                </li>
+                <li>
+                    <a href="{{ route('frontend.home') }}">Podcasts </a>
                 </li>
 
                 @auth

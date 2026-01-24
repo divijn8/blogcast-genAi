@@ -45,6 +45,5 @@ Route::middleware(['auth'])->group((function() {
 
 Auth::routes();
 
-Route::get('/home', [\App\Http\Controllers\BlogsController::class, 'blogs'])->name('frontend.home');
 Route::post('/comments', [App\Http\Controllers\CommentController::class, 'store'])->name('comments.store')->middleware('auth');
 
