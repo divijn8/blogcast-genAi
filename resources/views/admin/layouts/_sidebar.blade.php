@@ -42,12 +42,7 @@
              class="collapse {{ \App\Helpers\RoutingHelper::isPostRoute() ? 'show' : '' }}"
              data-parent="#accordionSidebar">
 
-            <div class="bg-white py-2 collapse-inner rounded">
-                <a class="collapse-item {{ \App\Helpers\RoutingHelper::isPostIndex() ? 'active' : '' }}"
-                   href="{{ route('admin.posts.index') }}">
-                    Show All Blogs
-                </a>
-
+             <div class="bg-white py-2 collapse-inner rounded">
                 <a class="collapse-item {{ \App\Helpers\RoutingHelper::isPostCreate() ? 'active' : '' }}"
                    href="{{ route('admin.posts.create') }}">
                     Create Blog
@@ -56,6 +51,11 @@
                 <a class="collapse-item {{ \App\Helpers\RoutingHelper::isPostDraft() ? 'active' : '' }}"
                    href="{{ route('admin.posts.drafts') }}">
                     Draft Blogs
+                </a>
+
+                <a class="collapse-item {{ \App\Helpers\RoutingHelper::isPostIndex() ? 'active' : '' }}"
+                   href="{{ route('admin.posts.index') }}">
+                    Show All Blogs
                 </a>
             </div>
         </div>
@@ -92,14 +92,14 @@
              data-parent="#accordionSidebar">
 
             <div class="bg-white py-2 collapse-inner rounded">
-                <a class="collapse-item {{ \App\Helpers\RoutingHelper::isCategoryIndex() ? 'active' : '' }}"
-                   href="{{ route('admin.categories.index') }}">
-                    Show All
+                <a class="collapse-item {{ \App\Helpers\RoutingHelper::isCategoryCreate() ? 'active' : '' }}"
+                href="{{ route('admin.categories.create') }}">
+                Create Category
                 </a>
 
-                <a class="collapse-item {{ \App\Helpers\RoutingHelper::isCategoryCreate() ? 'active' : '' }}"
-                   href="{{ route('admin.categories.create') }}">
-                    Create Category
+                <a class="collapse-item {{ \App\Helpers\RoutingHelper::isCategoryIndex() ? 'active' : '' }}"
+                href="{{ route('admin.categories.index') }}">
+                    Show All
                 </a>
             </div>
         </div>
@@ -121,14 +121,14 @@
              data-parent="#accordionSidebar">
 
             <div class="bg-white py-2 collapse-inner rounded">
-                <a class="collapse-item {{ \App\Helpers\RoutingHelper::isTagIndex() ? 'active' : '' }}"
-                   href="{{ route('admin.tags.index') }}">
-                    Show All
-                </a>
-
                 <a class="collapse-item {{ \App\Helpers\RoutingHelper::isTagCreate() ? 'active' : '' }}"
                    href="{{ route('admin.tags.create') }}">
                     Create Tag
+                </a>
+
+                <a class="collapse-item {{ \App\Helpers\RoutingHelper::isTagIndex() ? 'active' : '' }}"
+                   href="{{ route('admin.tags.index') }}">
+                    Show All
                 </a>
             </div>
         </div>
