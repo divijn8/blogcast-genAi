@@ -57,6 +57,6 @@ class RoutingHelper
     }
 
     public static function isPostDraft() {
-        return Route::is(['admin.posts.draft']);
+        return Route::is(['admin.posts.drafts']);
     }
 }

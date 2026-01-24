@@ -47,19 +47,19 @@ class BlogsController extends Controller
         $blog->published_at = $request->published_at;
         $blog->save();
         session()->flash('success', 'Blog Set to Publish successfully');
-        return redirect(route('admin.posts.draft'));
+        return redirect(route('admin.posts.index'));
     }
 
 
-    public function draft()
+    public function drafts()
     {
         $authUser = auth()->user();
         $blogs = Post::with('category')
                     ->where('author_id', $authUser->id)
                     ->where('published_at', null)
                     ->latest('updated_at')
-                    ->paginate(2);
-        return view("admin.posts.draft", compact('blogs'));
+                    ->paginate(10);
+        return view("admin.posts.drafts", compact('blogs'));
     }
 
     public function show(Request $request, string $slug) {

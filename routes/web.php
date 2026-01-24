@@ -18,7 +18,7 @@ Route::prefix('admin')->name('admin.')->middleware(['auth'])->group(function () 
     //for users
     Route::resource('users',\App\Http\Controllers\admin\UserController::class);
 
-    Route::get('/blogs/drafts', [BlogsController::class, 'draft'])->name('posts.drafts');
+    Route::get('/blogs/drafts', [BlogsController::class, 'drafts'])->name('posts.drafts');
 
     Route::put('/blogs/{blog}/publish',[BlogsController::class, 'publishBlog'])->name('posts.publish');
 
