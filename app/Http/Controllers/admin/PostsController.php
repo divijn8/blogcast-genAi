@@ -48,34 +48,54 @@ class PostsController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(CreatePostRequest $request)
-    {
-        DB::beginTransaction();
+    public function store(CreatePostRequest $request) {
+    DB::beginTransaction();
 
-        try{
-            $data = $request->validated();
-            if($request->hasFile('thumbnail')) {
-                $filePath = $request->file('thumbnail')->store('thumbnails','public');
-                $data['thumbnail']=$filePath;
-            }
+    try{
+        $data = $request->validated();
 
-            $data['author_id']= auth()->id();
-
-            $post=Post::create($data);
-            $post->tags()->attach($request->tags);
-
-            DB::commit();
-
-            DispatchPostNotificationJob::dispatch($post->id);
-            return redirect()->route('admin.posts.index')
-                             ->with('success','Post created successfully!');
-        }catch(\Exception $e) {
-            DB::rollBack();
-            Log::error($e);
-            return redirect()->route('admin.posts.index')
-                             ->with('error','Server isuues.Try again later!');
+        if ($request->hasFile('thumbnail')) {
+            $filePath = $request->file('thumbnail')->store('thumbnails','public');
+            $data['thumbnail'] = $filePath;
         }
+
+        // ✅ Draft logic (published_at = null)
+        if ($request->has('save_as_draft')) {
+            $data['published_at'] = null;
+        }
+
+        $data['author_id'] = auth()->id();
+
+        $post = Post::create($data);
+
+        // ✅ Safe attach tags
+        if ($request->filled('tags')) {
+            $post->tags()->attach($request->tags);
+        }
+
+        DB::commit();
+
+        // ✅ Notify only if published
+        if ($post->published_at) {
+            DispatchPostNotificationJob::dispatch($post->id);
+        }
+
+        // ✅ Different flash messages
+        return redirect()->route('admin.posts.index')
+            ->with(
+                $post->published_at ? 'success' : 'warning',
+                $post->published_at ? 'Post published successfully!' : 'Post saved as draft.'
+            );
+
+    } catch (\Exception $e) {
+        DB::rollBack();
+        Log::error($e);
+
+        return redirect()->route('admin.posts.index')
+            ->with('error','Server issues. Try again later!');
     }
+}
+
 
     /**
      * Display the specified resource.
