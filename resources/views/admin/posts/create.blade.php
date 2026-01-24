@@ -229,10 +229,32 @@
 
         flatpickr("#published_at", {
             enableTime: true,
+            time_24hr: true,
+
+            defaultDate: null,          
+            minDate: "today",
+
             altInput: true,
             altFormat: "F j, Y H:i",
             dateFormat: "Y-m-d H:i",
+
+            onOpen: function(selectedDates, dateStr, instance) {
+                const now = new Date();
+
+                // Disable past time for today
+                if (instance.selectedDates.length) {
+                    const selected = instance.selectedDates[0];
+                    if (selected.toDateString() === now.toDateString()) {
+                        instance.set('minTime', now);
+                    } else {
+                        instance.set('minTime', '00:00');
+                    }
+                } else {
+                    instance.set('minTime', now);
+                }
+            }
         });
+
     </script>
 
 <script>
