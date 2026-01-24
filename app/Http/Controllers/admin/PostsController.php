@@ -80,12 +80,10 @@ class PostsController extends Controller
             DispatchPostNotificationJob::dispatch($post->id);
         }
 
-        // ✅ Different flash messages
-        return redirect()->route('admin.posts.index')
-            ->with(
-                $post->published_at ? 'success' : 'warning',
-                $post->published_at ? 'Post published successfully!' : 'Post saved as draft.'
-            );
+        if($post->published_at) {
+            return redirect()->route('admin.posts.index')->with('success','Post published successfully!');
+        }
+        return redirect()->route('admin.posts.drafts')->with('warning','Post drafted successfully!');
 
     } catch (\Exception $e) {
         DB::rollBack();
