@@ -16,7 +16,7 @@
 
         <!-- View Site -->
         <li class="nav-item">
-            <a class="nav-link text-primary font-weight-bold" href="{{ url('/') }}" target="_blank">
+            <a class="nav-link text-primary font-weight-bold" href="{{ route('frontend.home') }}" target="_blank">
                 <i class="fas fa-external-link-alt mr-1"></i> View Site
             </a>
         </li>
