@@ -194,21 +194,16 @@
                             </div>
 
                         <!-- Draft checkbox (aligned right) -->
-                        <div class="form-group d-flex mt-3 mb-4">
-                            <div class="form-check">
-                                <input
-                                    type="checkbox"
-                                    class="form-check-input"
-                                    id="draft"
-                                    name="draft"
-                                    {{ old('draft') ? 'checked' : '' }}
-                                >
-                                <label class="form-check-label ms-1" for="draft">Save as Draft</label>
-                            </div>
-                        </div>
+                        <input type="submit" class="btn btn-outline-primary" value="Publish Post">
+
+                        <button type="submit"
+                                name="save_as_draft"
+                                value="1"
+                                class="btn btn-outline-secondary ms-2">
+                            Save as Draft
+                        </button>
 
 
-                        <input type="submit" class="btn btn-outline-primary" value="Create Post">
                     </form>
                 </div>
             </div>
@@ -274,6 +269,13 @@
             console.error("Some issue in fetch at server");
         })
     }
+</script>
+
+<script>
+    document.getElementById('saveDraftBtn').addEventListener('click', function () {
+        document.getElementById('draft').value = 1;
+        this.closest('form').submit();
+    });
 </script>
 
     <script>
