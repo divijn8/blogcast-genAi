@@ -15,12 +15,8 @@ class SubscriptionController extends Controller
 {
     public function showPlans() {
         $plans= Plan::all();
-        $categories= Category::all();
-        $tags=Tag::all();
         return view('admin.subscription.plans',compact([
             'plans',
-            'categories',
-            'tags'
         ]));
     }
 
@@ -52,6 +48,7 @@ class SubscriptionController extends Controller
         ]);
         return redirect()->route('admin.dashboard')->with('success','Subscription activated!');
     }
+    
     public function cancel(){
         return view('subscriptions.cancel');
     }

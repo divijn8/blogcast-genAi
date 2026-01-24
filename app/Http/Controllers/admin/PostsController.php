@@ -59,7 +59,6 @@ class PostsController extends Controller
             $data['thumbnail'] = $filePath;
         }
 
-        // ✅ Draft logic (published_at = null)
         if ($request->has('save_as_draft')) {
             $data['published_at'] = null;
         }
@@ -68,14 +67,12 @@ class PostsController extends Controller
 
         $post = Post::create($data);
 
-        // ✅ Safe attach tags
         if ($request->filled('tags')) {
             $post->tags()->attach($request->tags);
         }
 
         DB::commit();
 
-        // ✅ Notify only if published
         if ($post->published_at) {
             DispatchPostNotificationJob::dispatch($post->id);
         }
@@ -163,37 +160,37 @@ class PostsController extends Controller
     }
 
     private function generatePrompt($title, $excerpt) {
-    $prompt = <<<PROMPT
-You are a friendly and creative blog writer. Write a **simple, clear, and engaging HTML blog article** based on the following details:
+        return <<<PROMPT
+            You are an expert content strategist and professional blog writer. Write a high-quality, authoritative, and engaging article based on the following:
 
-Title: "$title"
-Excerpt: "$excerpt"
+            Title: "$title"
+            Core Concept: "$excerpt"
 
-Instructions:
-* Write in a natural, easy-to-read tone — like telling a story to a friend.
-* Use **simple words and short sentences**. Avoid complex or formal vocabulary.
-* Do **not** include the title or excerpt in the article body.
-* Keep the article lively, relatable, and interesting — readers should enjoy reading it till the end.
-* Use proper HTML structure:
-  - Wrap main sections in `<h3>` tags (at least 4 of them).
-  - Use `<p>` for paragraphs, `<ul>` and `<li>` for lists when needed.
-  - Avoid Markdown code blocks (no ```html).
-  - Do **not** include any CSS or JavaScript.
-* Start with a short, catchy introduction that connects with the reader emotionally.
-* Focus closely on the given title and excerpt theme.
-* End with a short summary or reflection inside an `<h4>` tag.
+            Writing Guidelines:
+            1. Tone: Professional yet conversational, insightful, and persuasive. Avoid robotic or "childish" language.
+            2. Structure:
+            - Start with a hook-driven introduction that addresses a pain point or curiosity.
+            - Use exactly 4-5 <h3> subheadings to break down the topic logically.
+            - Use <ul> or <ol> for actionable steps or key takeaways.
+            - Every paragraph should provide value and maintain flow.
+            3. HTML Requirements:
+            - Use ONLY <h3>, <h4>, <p>, <ul>, <li>, and <strong> tags.
+            - NO Markdown (no ```), NO CSS, NO inline styles.
+            4. Final Touch: End with a thought-provoking conclusion or a summary under an <h4> tag.
 
-Keep the tone **friendly, conversational, and positive**.
-PROMPT;
-
-    return $prompt;
-}
+            Output ONLY the raw HTML content ready to be pasted into an editor.
+            PROMPT;
+    }
 
 
-    public function generateAI(Request $request,$token) {
-        $user = User::where('user_token',$token)->firstOrFail();
-        if(!$user->canGenerateArticle()){
-            return response()->json(['content'=>'You have reached ur limit','status'=>401]);
+    public function generateAI(Request $request) {
+
+        $user = auth()->user();
+        Log::info($user->name);
+        // $user = User::where('user_token',$token)->firstOrFail();
+
+        if (!$user) {
+            return response()->json(['content' => 'Unauthorized', 'status' => 401]);
         }
 
         $title = $request->title;
@@ -213,22 +210,23 @@ PROMPT;
             ]
         ];
 
-//        Log::info(json_encode($payload));
         $response = $client->post($url, ['json' => $payload, ['headers'=> ['Content-Type'=> 'application/json']]]);
-        Log::info("Status Code: " . $response->getStatusCode());
+
+
         if($response->getStatusCode() === 200) {
             $responseData = json_decode($response->getBody(), true);
-            Log::info($responseData['candidates'][0]['content']['parts'][0]['text']);
 
-            if ($user->canGenerateArticle()) {
-                $activeSubscription = $user->activeSubscription();
-               if($activeSubscription) {
+            $activeSubscription = $user->activeSubscription();
+            if ($activeSubscription && $activeSubscription->articles_remaining > 0) {
                 $activeSubscription->decrement('articles_remaining');
-               }
             }
 
             $user->increment('articles_generated');
-            $content = $responseData['candidates'][0]['content']['parts'][0]['text'] ?? '';
+
+            $content = $responseData['candidates'][0]['content']['parts'][0]['text'] ?? null;
+            if (!$content) {
+                return response()->json(['content' => 'AI could not generate content at this time. Please try a different topic.', 'status' => 500]);
+            }
 
             // Remove code fences like ```html or ```
             $content = preg_replace('/^```(?:html)?\s*/i', '', $content);

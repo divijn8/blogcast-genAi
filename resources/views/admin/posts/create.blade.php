@@ -231,7 +231,7 @@
             enableTime: true,
             time_24hr: true,
 
-            defaultDate: null,          
+            defaultDate: null,
             minDate: "today",
 
             altInput: true,
@@ -313,8 +313,7 @@
             //     return;
             // }
 
-            let userToken="{{auth()->user()->user_token}}";
-            fetch(`/api/posts/${userToken}/generate-ai`, {
+            fetch(`/generate-ai`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -348,7 +347,7 @@
 
                 // Hide the loader once the content is ready
                 loader.style.display = 'none';
-            }, 4000); // Simulate a delay of 3 seconds for the AI content generation
+            }, 10000); // Simulate a delay of 3 seconds for the AI content generation
         });
     </script>
 
