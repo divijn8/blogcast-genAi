@@ -12,6 +12,7 @@ Route::get('/blogs/categories/{category}', [\App\Http\Controllers\BlogsControlle
 Route::get('/blogs/tags/{tag}', [\App\Http\Controllers\BlogsController::class, 'showByTag'])->name('frontend.showByTag');
 
 Route::prefix('admin')->name('admin.')->middleware(['auth'])->group(function () {
+    Route::get('/posts/comments', [CommentController::class, 'index'])->name('posts.comments');
     //for tags
     Route::resource('tags', \App\Http\Controllers\admin\TagsController::class)->except(['show']);
     //for posts
@@ -31,10 +32,8 @@ Route::prefix('admin')->name('admin.')->middleware(['auth'])->group(function () 
     Route::put('categories/{category}', [\App\Http\Controllers\admin\CategoriesController::class, 'update'])->name('categories.update');
     Route::delete('categories/{category}', [\App\Http\Controllers\admin\CategoriesController::class, 'destroy'])->name('categories.destroy');
 
-    Route::get('/comments', [CommentController::class, 'index'])->name('comments.index');
-
-    Route::put('/comments/{comment}/approve',[CommentController::class, 'approve'])->name('comments.approve');
-    Route::put('/comments/{comment}/unapprove',[CommentController::class, 'unapprove'])->name('comments.unapprove');
+    Route::put('/posts/comments/{comment}/approve',[CommentController::class, 'approve'])->name('posts.comments.approve');
+    Route::put('/posts/comments/{comment}/unapprove',[CommentController::class, 'unapprove'])->name('posts.comments.unapprove');
 
     Route::get('dashboard',
         [\App\Http\Controllers\admin\UserController::class,'dashboard']

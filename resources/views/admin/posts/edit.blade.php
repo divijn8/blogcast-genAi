@@ -106,18 +106,47 @@
                             <span class="text-danger text-sm">{{ $message }}</span>
                             @enderror
                         </div>
-                        <div class="mb-3">
-                            <label for="thumbnail" class="form-label">Thumbnail</label>
-                            <input type="file"
-                                   accept="image/*"
-                                   class="form-control @error('thumbnail')is-invalid @enderror"
-                                   name="thumbnail"
-                                   value="{{old('thumbnail')}}"
-                                   id="thumbnail"/>
-                            @error('thumbnail')
-                                <span class="text-danger text-sm">{{ $message }}</span>
-                            @enderror
+
+                        <div class="mb-4">
+                            <label class="form-label d-block">Thumbnail</label>
+
+                            <div class="row align-items-center">
+                                <div class="col-md-4 col-lg-3 mb-3 mb-md-0">
+                                    <div class="image-preview-box">
+                                        <img id="thumbnailPreview"
+                                            src="{{ $post->thumbnail ? asset('storage/'.$post->thumbnail) : '' }}"
+                                            alt="Thumbnail">
+
+                                        <span id="noImageText" {{ $post->thumbnail ? 'style=display:none' : '' }}>
+                                            No Image Selected
+                                        </span>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-8 col-lg-9">
+                                    <label class="custom-file-upload w-100">
+                                        <input type="file"
+                                            accept="image/*"
+                                            class="form-control @error('thumbnail') is-invalid @enderror"
+                                            name="thumbnail"
+                                            value="{{old('thumbnail')}}"
+                                            id="thumbnail"
+                                            hidden>
+                                        <i class="fas fa-upload me-2"></i>  Choose Thumbnail
+                                    </label>
+
+                                    @error('thumbnail')
+                                        <span class="text-danger text-sm d-block mt-2">{{ $message }}</span>
+                                    @enderror
+
+                                    <small class="text-muted d-block mt-2 text-center">
+                                        Upload a new image to replace the existing thumbnail.
+                                    </small>
+                                </div>
+
+                            </div>
                         </div>
+
                         <div class="mb-3">
                             <label for="category_id" class="form-label">Category</label>
                             <select class="form-control select2 @error('category_id') is-invalid @enderror"
@@ -133,6 +162,7 @@
                             <span class="text-danger text-sm">{{ $message }}</span>
                             @enderror
                         </div>
+
                         <div class="mb-3">
                             <label for="tag_id" class="form-label">Tags</label>
                             <select class="form-control select2 @error('tags') is-invalid @enderror"
@@ -158,6 +188,28 @@
     <div class="loader" id="loader" style="display: none;">
         <div class="">Regenerating Magic With AI</div>
         <div class="spinner"></div>
+    </div>
+
+    <!-- AI Validation Modal -->
+    <div class="modal fade" id="aiErrorModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+
+                <div class="modal-header bg-danger text-white">
+                    <h5 class="modal-title">Missing Information</h5>
+                    <button type="button" class="close text-white" data-dismiss="modal">&times;</button>
+                </div>
+
+                <div class="modal-body text-center">
+                    <p id="aiModalMessage" class="mb-0"></p>
+                </div>
+
+                <div class="modal-footer justify-content-center">
+                    <button type="button" class="btn btn-danger" data-dismiss="modal">OK</button>
+                </div>
+
+            </div>
+        </div>
     </div>
 
     <style>
@@ -190,6 +242,54 @@
 
     </style>
 
+    <style>
+        .image-preview-box {
+            width: 100%;
+            max-width: 420px;
+            height: 240px;
+            border: 2px dashed #ccc;
+            border-radius: 8px;
+            background: #f8f9fc;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+        }
+
+        .image-preview-box img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+        }
+
+        .custom-file-upload {
+            width: 100%; /* 🔥 makes button big */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px; /* slightly taller */
+            border-radius: 10px;
+            border: 2px dashed #4e73df;
+            background: #f8f9fc;
+            color: #4e73df;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.3s ease;
+            font-size: 16px;
+        }
+
+        .custom-file-upload:hover {
+            background: #4e73df;
+            color: white;
+        }
+
+        #noImageText {
+            color: #999;
+            font-size: 14px;
+        }
+
+    </style>
+
 @endsection
 
 
@@ -199,37 +299,57 @@
     <script>
         $('.select2').select2();
     </script>
-       <script>
-        function generateArticleFromAI(evt) {
+    <script>
+        function showAIModal(message) {
+            document.getElementById('loader').style.display = 'none';
+            document.getElementById('aiModalMessage').innerText = message;
+            $('#aiErrorModal').modal('show');
+        }
+    </script>
 
-            const title = document.getElementById('title').value;
-            const excerpt = document.getElementById('excerpt').value;
+    <script>
+        function generateArticleFromAI() {
+
+            const title = document.getElementById('title').value.trim();
+            const excerpt = document.getElementById('excerpt').value.trim();
             const csrfToken = document.querySelector('meta[name="csrf-token"]').content;
+            const loader = document.getElementById('loader');
 
+            if (!title || !excerpt) {
+                showAIModal("You need to fill Title and Excerpt before AI can generate content.");
+                return;
+            }
 
-            // if(!title || !excerpt) {
-            //     alert("You need to fill title and excerpt for AI to generate the content.");
-            //     return;
-            // }
-            const hiddenInput = document.querySelector('input[name="content"]');
             const trixEditor = document.querySelector('trix-editor');
             trixEditor.editor.loadHTML('');
 
-            let userToken="{{auth()->user()->user_token}}";
+            loader.style.display = 'flex';
+
+            let userToken = "{{ auth()->user()->user_token }}";
+
             fetch(`/api/posts/${userToken}/generate-ai`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                     'X-CSRF-TOKEN': csrfToken
                 },
-                body: JSON.stringify({ title, excerpt})
+                body: JSON.stringify({ title, excerpt })
             })
-                .then(res => res.json())
-                .then(data => {
-                    document.querySelector('trix-editor').editor.insertHTML(data.content);
-                })
-                .catch(err => console.warn(err));
+            .then(res => {
+                if (!res.ok) throw new Error('AI error');
+                return res.json();
+            })
+            .then(data => {
+                trixEditor.editor.insertHTML(data.content);
+            })
+            .catch(() => {
+                showAIModal("Something went wrong while generating AI content.");
+            })
+            .finally(() => {
+                loader.style.display = 'none';
+            });
         }
+
         document.getElementById('generateArticleFromAI').addEventListener('click', generateArticleFromAI);
     </script>
     <script>
@@ -267,26 +387,36 @@
             })
         }
     </script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
 
-<script>
-    // Get the loader and the "Generate Article With AI" button
-    const loader = document.getElementById('loader');
-    const generateArticleButton = document.getElementById('generateArticleFromAI');
+            const fileInput = document.getElementById('thumbnail');
+            const previewImg = document.getElementById('thumbnailPreview');
+            const noImageText = document.getElementById('noImageText');
 
-    // When the button is clicked, show the loader and simulate content generation
-    generateArticleButton.addEventListener('click', function() {
-        // Show loader
-        loader.style.display = 'flex';
+            fileInput.addEventListener('change', function(e) {
+                const file = e.target.files[0];
 
-        // Simulate an AI content generation process (you can replace this with an actual AJAX request)
-        setTimeout(function() {
-            // Simulate AI-generated content being added to the editor
-            const editor = document.querySelector('trix-editor');
-            editor.editor.setSelectedRange([0, 0]); // Optional: place the cursor at the beginning
+                if (!file) return;
 
-            // Hide the loader once the content is ready
-            loader.style.display = 'none';
-        }, 5000); // Simulate a delay of 3 seconds for the AI content generation
-    });
-</script>
+                // Validate image type
+                if (!file.type.startsWith('image/')) {
+                    alert("Please select a valid image file.");
+                    return;
+                }
+
+                const reader = new FileReader();
+
+                reader.onload = function(event) {
+                    previewImg.src = event.target.result; // 🔥 local image replaces server image
+                    previewImg.style.display = "block";
+                    noImageText.style.display = "none";
+                };
+
+                reader.readAsDataURL(file);
+            });
+
+        });
+    </script>
+
 @endsection

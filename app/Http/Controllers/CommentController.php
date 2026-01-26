@@ -12,9 +12,10 @@ class CommentController extends Controller
 
     public function index()
     {
-        $comments = Comments::with('posts')->latest()->get();
-        return view('admin.comments.index', compact(['comments']));
+        $comments = Comments::with('post')->latest()->get();
+        return view('admin.posts.comments', compact(['comments']));
     }
+
 
     public function store(CreateCommentsRequest $request, int $id)
     {
@@ -56,7 +57,7 @@ class CommentController extends Controller
         $comment->save();
 
         session()->flash('success', 'Comment approved...');
-        return redirect(route('admin.blogs.comments'));
+        return redirect(route('admin.posts.comments'));
     }
 
     public function unapprove(Comments $comment)
@@ -65,7 +66,7 @@ class CommentController extends Controller
         $comment->save();
 
         session()->flash('error', 'Comment Unapproved...');
-        return redirect(route('admin.blogs.comments'));
+        return redirect(route('admin.posts.comments'));
     }
 
 }

@@ -48,6 +48,11 @@
                     Create Blog
                 </a>
 
+                <a class="collapse-item {{ \App\Helpers\RoutingHelper::isPostIndex() ? 'active' : '' }}"
+                   href="{{ route('admin.posts.comments') }}">
+                    Comments
+                </a>
+
                 <a class="collapse-item {{ \App\Helpers\RoutingHelper::isPostDraft() ? 'active' : '' }}"
                    href="{{ route('admin.posts.drafts') }}">
                     Draft Blogs
@@ -59,14 +64,48 @@
                 </a>
             </div>
         </div>
+
+
     </li>
 
-    <!-- Comments -->
-    <li class="nav-item {{ request()->routeIs('admin.comments.*') ? 'active' : '' }}">
-        <a class="nav-link" href="{{ route('admin.comments.index') }}">
-            <i class="fas fa-fw fa-comments"></i>
-            <span>Comments</span>
+    <li class="nav-item {{ \App\Helpers\RoutingHelper::isPostRoute() ? 'active' : '' }}">
+        <a class="nav-link {{ \App\Helpers\RoutingHelper::isPostRoute() ? '' : 'collapsed' }}"
+           href="#"
+           data-toggle="collapse"
+           data-target="#collapsePodcasts">
+
+            <i class="fas fa-fw fa-newspaper"></i>
+            <span>Podcasts</span>
         </a>
+
+        <div id="collapsePodcasts"
+             class="collapse {{ \App\Helpers\RoutingHelper::isPostRoute() ? 'show' : '' }}"
+             data-parent="#accordionSidebar">
+
+             <div class="bg-white py-2 collapse-inner rounded">
+                <a class="collapse-item {{ \App\Helpers\RoutingHelper::isPostCreate() ? 'active' : '' }}"
+                   href="{{ route('admin.posts.create') }}">
+                    Create Podcast
+                </a>
+
+                <a class="collapse-item {{ \App\Helpers\RoutingHelper::isPostIndex() ? 'active' : '' }}"
+                   href="{{ route('admin.posts.comments') }}">
+                    Comments
+                </a>
+
+                <a class="collapse-item {{ \App\Helpers\RoutingHelper::isPostDraft() ? 'active' : '' }}"
+                   href="{{ route('admin.posts.drafts') }}">
+                    Draft Podcasts
+                </a>
+
+                <a class="collapse-item {{ \App\Helpers\RoutingHelper::isPostIndex() ? 'active' : '' }}"
+                   href="{{ route('admin.posts.index') }}">
+                    Show All Podcasts
+                </a>
+            </div>
+        </div>
+
+
     </li>
 
     <hr class="sidebar-divider">

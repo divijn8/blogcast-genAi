@@ -17,7 +17,7 @@
                 <div class="d-flex justify-content-between align-items-center mb-2">
                     <h5 class="mb-0 text-dark">
                         <i class="fas fa-newspaper text-primary"></i>
-                        {{ $comment->posts->title }}
+                        {{ $comment->post->title }}
                     </h5>
 
                     @if ($comment->approved_by)
@@ -47,14 +47,14 @@
                         <button class="btn btn-outline-warning btn-sm"
                             data-toggle="modal"
                             data-target="#unapproveModal"
-                            onclick="setUnapproveAction('{{ route('admin.comments.unapprove', $comment) }}')">
+                            onclick="setUnapproveAction('{{ route('admin.posts.comments.unapprove', $comment) }}')">
                             <i class="fas fa-times"></i> Unapprove
                         </button>
                     @else
                         <button class="btn btn-outline-success btn-sm"
                             data-toggle="modal"
                             data-target="#approveModal"
-                            onclick="setApproveAction('{{ route('admin.comments.approve', $comment) }}')">
+                            onclick="setApproveAction('{{ route('admin.posts.comments.approve', $comment) }}')">
                             <i class="fas fa-check"></i> Approve
                         </button>
                     @endif

@@ -25,24 +25,24 @@
                     </thead>
                     <tbody>
                         @foreach($posts as $post)
-                                <tr>
-                                    <td>{{ $post->id }}</td>
-                                    <td width="20%">
-                                        <img src="{{ asset($post->thumbnail_path) }}" alt="{{ $post->title }}" class="img-fluid">
-                                    </td>
-                                    <td>{{ $post->title }}</td>
-                                    <td>{{ $post->category->name }}</td>
-                                    <td>{{ implode(', ', $post->tags->pluck('name')->toArray()) }}</td>
-                                    <td>
-                                        <a href="{{ route('admin.posts.edit', $post) }}" class="btn btn-outline-warning">
-                                            <i class="fas fa-edit"></i>
-                                        </a>
-                                        <button class="btn btn-outline-danger delete-post" data-toggle="modal" data-target="#deleteModal" data-post-id="{{ $post->id }}">
-                                            <i class="fas fa-trash"></i>
-                                        </button>
-                                    </td>
-                                </tr>
-                            @endforeach
+                            <tr>
+                                <td>{{ $post->id }}</td>
+                                <td width="20%">
+                                    <img src="{{ asset($post->thumbnail_path) }}" alt="{{ $post->title }}" class="img-fluid">
+                                </td>
+                                <td>{{ $post->title }}</td>
+                                <td>{{ $post->category->name }}</td>
+                                <td>{{ implode(', ', $post->tags->pluck('name')->toArray()) }}</td>
+                                <td>
+                                    <a href="{{ route('admin.posts.edit', $post) }}" class="btn btn-outline-warning">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                    <button class="btn btn-outline-danger delete-post" data-toggle="modal" data-target="#deleteModal" data-post-id="{{ $post->id }}">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                        @endforeach
 
                     </tbody>
                 </table>

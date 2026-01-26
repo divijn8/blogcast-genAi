@@ -26,7 +26,11 @@ class PostsController extends Controller
     public function index()
     {
         $user = auth()->user();
-        $posts=$user->posts()->with('category')->with('tags')->latest()->paginate(20);
+        if($user->isAdmin()){
+            $posts=Post::with('category')->with('tags')->orderBy("id", "desc")->paginate(20);
+            }else {
+            $posts=$user->posts()->with('category')->with('tags')->orderBy("id", "desc")->paginate(20);
+        }
         return view('admin.posts.index',compact([
             'posts'
         ]));

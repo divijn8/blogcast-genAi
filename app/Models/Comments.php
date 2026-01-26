@@ -9,7 +9,7 @@ class Comments extends Model
     protected $table = 'comments';
     protected $guarded = [];
 
-    public function posts(){
+    public function post(){
         return $this->belongsTo(Post::class, 'post_id');
     }
 
