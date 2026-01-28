@@ -122,6 +122,8 @@
     .badge-blue { background: #e8f0fe; color: #4e73df; }
     .badge-green { background: #e6fffa; color: #1cc88a; }
     .badge-purple { background: #f3ebff; color: #6f42c1; }
+    .card-border-cyan { border-top: 5px solid #36b9cc; }
+    .badge-cyan { background:#e0f7fa; color:#36b9cc; }
 
     .ai-outline-box {
         background: #f8f9fc;
@@ -139,6 +141,33 @@
     .btn-generate {
         border-radius: 0 0 12px 12px;
     }
+
+    /* FORCE FULLSCREEN AI MODAL */
+#aiStructureModal.modal {
+    padding: 0 !important;
+}
+
+#aiStructureModal .modal-dialog {
+    width: 100vw;
+    max-width: 100vw;
+    height: 100vh;
+    margin: 0;
+}
+
+#aiStructureModal .modal-content {
+    height: 100vh;
+    border-radius: 0;
+    border: none;
+    display: flex;
+    flex-direction: column;
+}
+
+#aiStructureModal .modal-body {
+    flex: 1;
+    overflow-y: auto;
+    padding: 2rem;
+}
+
 </style>
 
 @endsection
@@ -156,6 +185,9 @@
                 <div class="card-body">
                     <form action="{{ route('admin.posts.store') }}" method="POST" enctype="multipart/form-data">
                         @csrf
+                        <button type="button" id="btn-ai-agent" class="btn btn-info mb-3">
+                            <i class="fas fa-robot"></i> AI Blog Architect
+                        </button>
                         <div class="mb-3">
                             <label for="title" class="form-label">Title</label>
                             <input type="text"
@@ -204,9 +236,7 @@
                                     <span class="trix-button-group" data-trix-button-group="ai">
                                         <button id="generateArticleFromAI" type="button" class="trix-button" title="Generate Article With AI" tabindex="-1"><i class="fas fa-magic"></i></button>
                                     </span>
-                                    <button type="button" id="btn-ai-agent" class="btn btn-info mb-3">
-                                        <i class="fas fa-robot"></i> AI Blog Architect
-                                    </button>
+
 
 
                                     <span class="trix-button-group-spacer"></span>
@@ -349,64 +379,108 @@
     <div class="spinner"></div>
 </div>
 
-<!-- AI Validation Modal -->
-<div class="modal fade" id="aiErrorModal" tabindex="-1">
-    <div class="modal-dialog modal-dialog-centered">
+<div class="modal fade modal-fullscreen" id="aiStructureModal" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
         <div class="modal-content">
 
-            <div class="modal-header bg-danger text-white">
-                <h5 class="modal-title">Missing Information</h5>
-                <button type="button" class="close text-white" data-dismiss="modal">&times;</button>
+            <div class="modal-header bg-white border-bottom shadow-sm py-3">
+                <div class="container d-flex align-items-center justify-content-between">
+                    <h5 class="modal-title text-primary font-weight-bold">
+                        <i class="fas fa-robot mr-2"></i> AI Blog Architect
+                    </h5>
+                    <button type="button" class="close" data-dismiss="modal">
+                        <span>&times;</span>
+                    </button>
+                </div>
             </div>
 
-            <div class="modal-body text-center">
-                <p id="aiModalMessage" class="mb-0"></p>
-            </div>
+            <div class="modal-body bg-light">
+                <div class="container">
 
-            <div class="modal-footer justify-content-center">
-                <button type="button" class="btn btn-danger" data-dismiss="modal">OK</button>
+                    <!-- INPUT SECTION -->
+                    <div id="ai-input-section" class="row justify-content-center mt-5">
+                        <div class="col-lg-7 col-md-9 text-center">
+
+                            <h2 class="font-weight-bold mb-3">What are we writing about?</h2>
+                            <p class="text-muted mb-4">
+                                The AI will analyze and suggest multiple content structures.
+                            </p>
+
+                            <div class="card shadow-lg border-0 rounded-lg text-left p-4">
+                                <div class="form-group">
+                                    <label class="font-weight-bold small text-uppercase text-muted">
+                                        Blog Title
+                                    </label>
+                                    <input type="text" id="ai_modal_title"
+                                           class="form-control form-control-lg bg-light border-0">
+                                </div>
+
+                                <div class="form-group mb-4">
+                                    <label class="font-weight-bold small text-uppercase text-muted">
+                                        Concept / Excerpt
+                                    </label>
+                                    <textarea id="ai_modal_excerpt"
+                                              class="form-control bg-light border-0"
+                                              rows="3">
+                                    </textarea>
+                                </div>
+
+                                <button id="btn-start-research"
+                                        class="btn btn-primary btn-block btn-lg font-weight-bold">
+                                    Start Research
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- RESULTS SECTION -->
+                    <div id="ai-results-section" style="display:none;">
+
+                        <div id="ai-loading" class="text-center py-5">
+                            <div class="spinner-border text-primary"
+                                 style="width:4rem;height:4rem"></div>
+                            <h4 class="mt-4 font-weight-bold">Analyzing Structures…</h4>
+                            <p class="text-muted">
+                                Evaluating different content approaches.
+                            </p>
+                        </div>
+
+                        <div id="structure-options" class="row"></div>
+
+                    </div>
+
+                </div>
             </div>
 
         </div>
     </div>
 </div>
 
-<div class="modal fade modal-fullscreen" id="aiStructureModal" tabindex="-1">
-    <div class="modal-dialog modal-dialog-centered modal-xl">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5><i class="fas fa-robot"></i> AI Blog Architect</h5>
-                <button type="button" class="close" data-dismiss="modal">&times;</button>
+
+<div class="modal fade" id="aiErrorModal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content border-0 shadow-lg">
+
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title">
+                    <i class="fas fa-exclamation-triangle mr-2"></i>
+                    Error.
+                </h5>
+                <button type="button" class="close text-white" data-dismiss="modal">
+                    <span>&times;</span>
+                </button>
             </div>
 
-            <div class="modal-body bg-light">
-                <!-- INPUT -->
-                <div id="ai-input-section">
-                    <div class="form-group">
-                        <label>Blog Title</label>
-                        <input type="text" id="ai_modal_title" class="form-control">
-                    </div>
-
-                    <div class="form-group">
-                        <label>Concept / Excerpt</label>
-                        <textarea id="ai_modal_excerpt" class="form-control" rows="3"></textarea>
-                    </div>
-
-                    <button id="btn-start-research" class="btn btn-primary">
-                        Start Research
-                    </button>
-                </div>
-
-                <!-- RESULTS -->
-                <div id="ai-results-section" style="display:none;">
-                    <div id="ai-loading" class="text-center py-4">
-                        <div class="spinner-border"></div>
-                        <p class="mt-2">Analyzing best structures...</p>
-                    </div>
-
-                    <div id="structure-options" class="row"></div>
-                </div>
+            <div class="modal-body text-center">
+                <p id="aiErrorMessage" class="mb-0"></p>
             </div>
+
+            <div class="modal-footer justify-content-center">
+                <button type="button" class="btn btn-danger" data-dismiss="modal">
+                    OK
+                </button>
+            </div>
+
         </div>
     </div>
 </div>
@@ -450,7 +524,13 @@
         });
 
     </script>
-
+<script>
+    function showAIError(message) {
+        $('#aiErrorMessage').text(message);
+        $('#aiStructureModal').modal('hide');
+        $('#aiErrorModal').modal('show');
+    }
+</script>
 <script>
     document.addEventListener('trix-attachment-add', function (evt) {
         const attachment = evt.attachment;
@@ -478,7 +558,6 @@
                 });
             } else {
                 console.warn("Image Upload Failed!");
-
             }
         })
         .catch(() => {
@@ -494,168 +573,189 @@
     });
 </script>
 
-    <script>
-        function generateArticleFromAI() {
+<script>
+    function generateArticleFromAI() {
 
-            const title = document.getElementById('title').value.trim();
-            const excerpt = document.getElementById('excerpt').value.trim();
-            const csrfToken = document.querySelector('meta[name="csrf-token"]').content;
+        const title = document.getElementById('title').value.trim();
+        const excerpt = document.getElementById('excerpt').value.trim();
+        const csrfToken = document.querySelector('meta[name="csrf-token"]').content;
 
-            if (!title || !excerpt) {
-                showAIModal("You need to fill Title and Excerpt before AI can generate content.");
-                return;
-            }
-
-            const loader = document.getElementById('loader');
-            loader.style.display = 'flex';
-
-            fetch('/generate-ai', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': csrfToken
-                },
-                body: JSON.stringify({ title, excerpt })
-            })
-            .then(res => {
-                if (!res.ok) throw new Error('AI error');
-                return res.json();
-            })
-            .then(data => {
-                document.querySelector('trix-editor').editor.insertHTML(data.content);
-            })
-            .catch(() => {
-                showAIModal("Something went wrong while generating AI content.");
-            })
-            .finally(() => {
-                loader.style.display = 'none';
-            });
+        if (!title || !excerpt) {
+            showAIModal("You need to fill Title and Excerpt before AI can generate content.");
+            return;
         }
 
+        const loader = document.getElementById('loader');
+        loader.style.display = 'flex';
 
-        document.getElementById('generateArticleFromAI').addEventListener('click', generateArticleFromAI);
-    </script>
-
-    <script>
-        document.getElementById('thumbnail').addEventListener('change', function(e) {
-            const file = e.target.files[0];
-            if (!file) return;
-
-            const reader = new FileReader();
-            reader.onload = function(event) {
-                const preview = document.getElementById('thumbnailPreview');
-                preview.src = event.target.result;
-                preview.style.display = "block";
-                document.getElementById('noImageText').style.display = "none";
-            };
-            reader.readAsDataURL(file);
-        });
-    </script>
-    <script>
-        function showAIModal(message) {
-            const loader = document.getElementById('loader');
+        fetch('/generate-ai', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': csrfToken
+            },
+            body: JSON.stringify({ title, excerpt })
+        })
+        .then(res => {
+            if (!res.ok) throw new Error('AI error');
+            return res.json();
+        })
+        .then(data => {
+            document.querySelector('trix-editor').editor.insertHTML(data.content);
+        })
+        .catch(() => {
+            showAIModal("Something went wrong while generating AI content.");
+        })
+        .finally(() => {
             loader.style.display = 'none';
+        });
+    }
 
-            document.getElementById('aiModalMessage').innerText = message;
-            $('#aiErrorModal').modal('show');
+
+    document.getElementById('generateArticleFromAI').addEventListener('click', generateArticleFromAI);
+</script>
+
+<script>
+    document.getElementById('thumbnail').addEventListener('change', function(e) {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.onload = function(event) {
+            const preview = document.getElementById('thumbnailPreview');
+            preview.src = event.target.result;
+            preview.style.display = "block";
+            document.getElementById('noImageText').style.display = "none";
+        };
+        reader.readAsDataURL(file);
+    });
+</script>
+<script>
+    function showAIModal(message) {
+        const loader = document.getElementById('loader');
+        loader.style.display = 'none';
+
+        document.getElementById('aiModalMessage').innerText = message;
+        $('#aiErrorModal').modal('show');
+    }
+
+</script>
+
+<script>
+    $('#btn-ai-agent').on('click', function () {
+        $('#aiStructureModal').modal('show');
+        $('#ai-input-section').show();
+        $('#ai-results-section').hide();
+    });
+
+    $('#btn-start-research').on('click', function () {
+
+        let title = $('#ai_modal_title').val().trim();
+        let excerpt = $('#ai_modal_excerpt').val().trim();
+
+        if (!title || !excerpt) {
+            showAIError('Title and Excerpt are required.');
+            return;
         }
 
-    </script>
+        $('#ai-input-section').hide();
+        $('#ai-results-section').show();
+        $('#ai-loading').show();
+        $('#structure-options').empty();
 
-    <script>
-        $('#btn-ai-agent').on('click', function () {
-            $('#aiStructureModal').modal('show');
-            $('#ai-input-section').show();
-            $('#ai-results-section').hide();
-        });
+        $.ajax({
+            url: "{{ route('admin.ai.analyze') }}",
+            type: "POST",
+            data: {
+                _token: "{{ csrf_token() }}",
+                title: title,
+                excerpt: excerpt
+            },
+            success: function (res) {
 
-        $('#btn-start-research').on('click', function () {
+                $('#ai-loading').hide();
 
-            let title = $('#ai_modal_title').val().trim();
-            let excerpt = $('#ai_modal_excerpt').val().trim();
+                res.structures.forEach(function (item, index) {
 
-            if (!title || !excerpt) {
-                alert('Title and Excerpt are required');
-                return;
-            }
+                    let badge = (item.badge || '').toLowerCase();
+                    let color = 'blue';
 
-            $('#ai-input-section').hide();
-            $('#ai-results-section').show();
-            $('#ai-loading').show();
-            $('#structure-options').empty();
+                    if (badge === 'beginner') color = 'green';
+                    else if (badge === 'intermediate') color = 'purple';
+                    else if (badge === 'advanced') color = 'blue';
+                    else if (badge === 'expert') color = 'cyan';
 
-            $.ajax({
-                url: "{{ route('admin.ai.analyze') }}",
-                type: "POST",
-                data: {
-                    _token: "{{ csrf_token() }}",
-                    title: title,
-                    excerpt: excerpt
-                },
-                success: function (res) {
+                    let cleanOutline = item.outline
+                        .replace(/^#+\s*/gm, '')
+                        .trim();
 
-                    $('#ai-loading').hide();
+                    let outlineHtml = item.outline
+                        .split('\n')
+                        .map(line => `<li>${line}</li>`)
+                        .join('');
 
-                    res.structures.forEach(function (item) {
+                    let rawJson = JSON.stringify(item, null, 2);
 
-                        let list = item.outline
-                            .split('\n')
-                            .map(l => `<li>${l}</li>`)
-                            .join('');
-
-                        let card = `
-                            <div class="col-md-4">
-                                <div class="ai-structure-card">
-                                    <h6>${item.name}</h6>
-
-                                    <div class="ai-outline-box">
-                                        <ul>${list}</ul>
-                                    </div>
-
-                                    <button class="btn btn-primary btn-generate btn-select-structure"
-                                        data-outline="${encodeURIComponent(item.outline)}">
-                                        Write This
-                                    </button>
+                    let card = `
+                        <div class="col-xl-3 col-lg-6 col-md-6 mb-4">
+                            <div class="ai-structure-card card-border-${color}">
+                                <div class="ai-card-header">
+                                    <h5 class="ai-structure-title">${item.name}</h5>
+                                    <span class="badge-ai badge-${color}">
+                                        ${item.badge ?? 'AI'}
+                                    </span>
                                 </div>
+
+                                <div class="ai-outline-box">
+                                    <ul class="mt-2">${outlineHtml}</ul>
+                                </div>
+
+                                <button class="btn btn-primary btn-generate btn-select-structure"
+                                    data-outline="${encodeURIComponent(item.outline)}">
+                                    Write This
+                                </button>
                             </div>
-                        `;
+                        </div>`;
 
-                        $('#structure-options').append(card);
-                    });
-                },
-                error() {
-                    alert('AI analyze failed');
-                }
-            });
+
+                    $('#structure-options').append(card);
+                });
+            },
+            error: function () {
+                $('#ai-loading').hide();
+                showAIError('AI analysis failed. Please try again.');
+            }
         });
+    });
 
-        $(document).on('click', '.btn-select-structure', function () {
+    $(document).on('click', '.btn-select-structure', function () {
 
-            let outline = decodeURIComponent($(this).data('outline'));
-            let title = $('#ai_modal_title').val();
-            let excerpt = $('#ai_modal_excerpt').val();
+        let outline = decodeURIComponent($(this).data('outline'));
+        let title = $('#ai_modal_title').val();
+        let excerpt = $('#ai_modal_excerpt').val();
 
-            $('#aiStructureModal').modal('hide');
+        $.ajax({
+            url: "{{ route('admin.ai.generate') }}",
+            type: "POST",
+            data: {
+                _token: "{{ csrf_token() }}",
+                title: title,
+                excerpt: excerpt,
+                structure_outline: outline
+            },
+            success: function (res) {
+                document.querySelector('trix-editor')
+                    .editor.insertHTML(res.body);
 
-            $.ajax({
-                url: "{{ route('admin.ai.generate') }}",
-                type: "POST",
-                data: {
-                    _token: "{{ csrf_token() }}",
-                    title: title,
-                    excerpt: excerpt,
-                    structure_outline: outline
-                },
-                success: function (res) {
-                    document.querySelector('trix-editor').editor.insertHTML(res.body);
-                    $('#title').val(title);
-                    $('#excerpt').val(excerpt);
-                },
-                error() {
-                    alert('AI generation failed');
-                }
-            });
+                $('#title').val(title);
+                $('#excerpt').val(excerpt);
+                $('#aiStructureModal').modal('hide');
+            },
+            error: function () {
+                showAIError('AI generation failed.');
+            }
         });
-    </script>
+    });
 
+</script>
 @endsection
