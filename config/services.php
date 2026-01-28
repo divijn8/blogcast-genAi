@@ -40,4 +40,12 @@ return [
         'secret'=>env('STRIPE_SECRET'),
     ],
 
+    'firecrawl' => [
+        'key' => env('FIRECRAWL_API_KEY'),
+    ],
+    
+    'groq' => [
+        'key' => env('GROQ_API_KEY'),
+    ],
+
 ];

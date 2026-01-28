@@ -87,6 +87,60 @@
     }
 
 </style>
+
+<style>
+    .ai-structure-card {
+        border: none;
+        border-radius: 12px;
+        background: #fff;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+        transition: all 0.3s ease;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+    }
+    .ai-structure-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 12px 20px rgba(0,0,0,0.1);
+    }
+    .card-border-blue { border-top: 5px solid #4e73df; }
+    .card-border-green { border-top: 5px solid #1cc88a; }
+    .card-border-purple { border-top: 5px solid #6f42c1; }
+
+    .ai-card-header {
+        padding: 1rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    .badge-ai {
+        font-size: 0.7rem;
+        padding: 0.3em 0.6em;
+        border-radius: 20px;
+        font-weight: 700;
+    }
+    .badge-blue { background: #e8f0fe; color: #4e73df; }
+    .badge-green { background: #e6fffa; color: #1cc88a; }
+    .badge-purple { background: #f3ebff; color: #6f42c1; }
+
+    .ai-outline-box {
+        background: #f8f9fc;
+        margin: 1rem;
+        padding: 1rem;
+        border-radius: 8px;
+        font-size: 0.85rem;
+        flex-grow: 1;
+        overflow-y: auto;
+        border: 1px dashed #d1d3e2;
+    }
+    .ai-outline-box ul {
+        padding-left: 1.2rem;
+    }
+    .btn-generate {
+        border-radius: 0 0 12px 12px;
+    }
+</style>
+
 @endsection
 
 
@@ -150,6 +204,10 @@
                                     <span class="trix-button-group" data-trix-button-group="ai">
                                         <button id="generateArticleFromAI" type="button" class="trix-button" title="Generate Article With AI" tabindex="-1"><i class="fas fa-magic"></i></button>
                                     </span>
+                                    <button type="button" id="btn-ai-agent" class="btn btn-info mb-3">
+                                        <i class="fas fa-robot"></i> AI Blog Architect
+                                    </button>
+
 
                                     <span class="trix-button-group-spacer"></span>
 
@@ -292,26 +350,66 @@
 </div>
 
 <!-- AI Validation Modal -->
-    <div class="modal fade" id="aiErrorModal" tabindex="-1">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content">
+<div class="modal fade" id="aiErrorModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
 
-                <div class="modal-header bg-danger text-white">
-                    <h5 class="modal-title">Missing Information</h5>
-                    <button type="button" class="close text-white" data-dismiss="modal">&times;</button>
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title">Missing Information</h5>
+                <button type="button" class="close text-white" data-dismiss="modal">&times;</button>
+            </div>
+
+            <div class="modal-body text-center">
+                <p id="aiModalMessage" class="mb-0"></p>
+            </div>
+
+            <div class="modal-footer justify-content-center">
+                <button type="button" class="btn btn-danger" data-dismiss="modal">OK</button>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<div class="modal fade modal-fullscreen" id="aiStructureModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5><i class="fas fa-robot"></i> AI Blog Architect</h5>
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+            </div>
+
+            <div class="modal-body bg-light">
+                <!-- INPUT -->
+                <div id="ai-input-section">
+                    <div class="form-group">
+                        <label>Blog Title</label>
+                        <input type="text" id="ai_modal_title" class="form-control">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Concept / Excerpt</label>
+                        <textarea id="ai_modal_excerpt" class="form-control" rows="3"></textarea>
+                    </div>
+
+                    <button id="btn-start-research" class="btn btn-primary">
+                        Start Research
+                    </button>
                 </div>
 
-                <div class="modal-body text-center">
-                    <p id="aiModalMessage" class="mb-0"></p>
-                </div>
+                <!-- RESULTS -->
+                <div id="ai-results-section" style="display:none;">
+                    <div id="ai-loading" class="text-center py-4">
+                        <div class="spinner-border"></div>
+                        <p class="mt-2">Analyzing best structures...</p>
+                    </div>
 
-                <div class="modal-footer justify-content-center">
-                    <button type="button" class="btn btn-danger" data-dismiss="modal">OK</button>
+                    <div id="structure-options" class="row"></div>
                 </div>
-
             </div>
         </div>
     </div>
+</div>
 
 @endsection
 
@@ -463,4 +561,101 @@
         }
 
     </script>
+
+    <script>
+        $('#btn-ai-agent').on('click', function () {
+            $('#aiStructureModal').modal('show');
+            $('#ai-input-section').show();
+            $('#ai-results-section').hide();
+        });
+
+        $('#btn-start-research').on('click', function () {
+
+            let title = $('#ai_modal_title').val().trim();
+            let excerpt = $('#ai_modal_excerpt').val().trim();
+
+            if (!title || !excerpt) {
+                alert('Title and Excerpt are required');
+                return;
+            }
+
+            $('#ai-input-section').hide();
+            $('#ai-results-section').show();
+            $('#ai-loading').show();
+            $('#structure-options').empty();
+
+            $.ajax({
+                url: "{{ route('admin.ai.analyze') }}",
+                type: "POST",
+                data: {
+                    _token: "{{ csrf_token() }}",
+                    title: title,
+                    excerpt: excerpt
+                },
+                success: function (res) {
+
+                    $('#ai-loading').hide();
+
+                    res.structures.forEach(function (item) {
+
+                        let list = item.outline
+                            .split('\n')
+                            .map(l => `<li>${l}</li>`)
+                            .join('');
+
+                        let card = `
+                            <div class="col-md-4">
+                                <div class="ai-structure-card">
+                                    <h6>${item.name}</h6>
+
+                                    <div class="ai-outline-box">
+                                        <ul>${list}</ul>
+                                    </div>
+
+                                    <button class="btn btn-primary btn-generate btn-select-structure"
+                                        data-outline="${encodeURIComponent(item.outline)}">
+                                        Write This
+                                    </button>
+                                </div>
+                            </div>
+                        `;
+
+                        $('#structure-options').append(card);
+                    });
+                },
+                error() {
+                    alert('AI analyze failed');
+                }
+            });
+        });
+
+        $(document).on('click', '.btn-select-structure', function () {
+
+            let outline = decodeURIComponent($(this).data('outline'));
+            let title = $('#ai_modal_title').val();
+            let excerpt = $('#ai_modal_excerpt').val();
+
+            $('#aiStructureModal').modal('hide');
+
+            $.ajax({
+                url: "{{ route('admin.ai.generate') }}",
+                type: "POST",
+                data: {
+                    _token: "{{ csrf_token() }}",
+                    title: title,
+                    excerpt: excerpt,
+                    structure_outline: outline
+                },
+                success: function (res) {
+                    document.querySelector('trix-editor').editor.insertHTML(res.body);
+                    $('#title').val(title);
+                    $('#excerpt').val(excerpt);
+                },
+                error() {
+                    alert('AI generation failed');
+                }
+            });
+        });
+    </script>
+
 @endsection

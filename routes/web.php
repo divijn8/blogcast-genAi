@@ -38,6 +38,11 @@ Route::prefix('admin')->name('admin.')->middleware(['auth'])->group(function () 
     Route::get('dashboard',
         [\App\Http\Controllers\admin\UserController::class,'dashboard']
     )->name('dashboard');
+
+    // AI Blog Architect
+    Route::post('/ai/analyze', [\App\Http\Controllers\AiController::class, 'analyze'])->name('ai.analyze');
+    Route::post('/ai/generate', [\App\Http\Controllers\AiController::class, 'generate'])->name('ai.generate');
+
 });
 
 Route::middleware(['auth'])->group((function() {
