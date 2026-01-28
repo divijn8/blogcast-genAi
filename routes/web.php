@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\BlogsController;
 use App\Http\Controllers\CommentController;
+use App\Http\Controllers\PodcastController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
@@ -10,6 +11,8 @@ Route::get('/', [\App\Http\Controllers\BlogsController::class, 'blogs'])->name('
 Route::get('/blogs/{slug}', [\App\Http\Controllers\BlogsController::class, 'show'])->name('frontend.show');
 Route::get('/blogs/categories/{category}', [\App\Http\Controllers\BlogsController::class, 'showByCategory'])->name('frontend.showByCategory');
 Route::get('/blogs/tags/{tag}', [\App\Http\Controllers\BlogsController::class, 'showByTag'])->name('frontend.showByTag');
+Route::get('/podcasts', [PodcastController::class, 'index'])->name('frontend.podcasts.index');
+Route::get('/podcast/{slug}', [PodcastController::class, 'show'])->name('frontend.podcasts.show');
 
 Route::prefix('admin')->name('admin.')->middleware(['auth'])->group(function () {
     Route::get('/posts/comments', [CommentController::class, 'index'])->name('posts.comments');
@@ -19,6 +22,8 @@ Route::prefix('admin')->name('admin.')->middleware(['auth'])->group(function () 
     Route::resource('posts', \App\Http\Controllers\admin\PostsController::class);
     //for users
     Route::resource('users',\App\Http\Controllers\admin\UserController::class);
+    //for podcast
+    Route::resource('podcasts', PodcastController::class);
 
     Route::get('/blogs/drafts', [BlogsController::class, 'drafts'])->name('posts.drafts');
 

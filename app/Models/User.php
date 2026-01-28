@@ -104,4 +104,11 @@ class User extends Authenticatable
         return $query->where('email_verified_at', NULL);
     }
 
+    public function favoriteCategories() {
+    // This finds categories the user interacts with most
+        return Category::whereHas('podcasts', function($q) {
+            $q->whereIn('id', $this->favorites()->pluck('podcast_id'));
+        })->get();
+    }
+
 }
