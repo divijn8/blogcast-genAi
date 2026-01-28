@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\Category;
+use App\Models\Podcast;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -131,6 +133,19 @@ class UserController extends Controller
         ->select('plans.articles_per_month')
         ->first();
 
-        return view('admin.dashboard', compact('postCount', 'totalViewCount', 'articlesRemaining','subscriptionStatus','mostUsedCategories','mostUsedTags','subscriptionPlan','totalArticles'));
+        $podcastStats = [
+            'total_episodes' => Podcast::count(),
+            'total_views' => Podcast::sum('view_count'),
+            'top_category' => Category::where('type', 'podcast')
+                                ->withCount('podcasts')
+                                ->orderBy('podcasts_count', 'desc')
+                                ->first(),
+            'fav_blog_cat' => Category::where('type', 'blog')
+                                ->withCount('posts')
+                                ->orderBy('posts_count', 'desc')
+                                ->first(),
+        ];
+
+        return view('admin.dashboard', compact('postCount', 'totalViewCount', 'articlesRemaining','subscriptionStatus','mostUsedCategories','mostUsedTags','subscriptionPlan','totalArticles, podcastStats'));
     }
 }
