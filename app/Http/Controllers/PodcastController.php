@@ -8,7 +8,7 @@ use Illuminate\Http\Request;
 
 class PodcastController extends Controller
 {
-    public function index() // Viewer and Admin index
+    public function index()
     {
         $podcasts = Podcast::with('category')->latest()->paginate(10);
         $totalListens = Podcast::sum('view_count');
@@ -17,7 +17,7 @@ class PodcastController extends Controller
         if (request()->is('admin/*')) {
             return view('admin.podcasts.index', compact('podcasts'));
         }
-        return view('frontend.podcasts', compact('podcasts', 'totalListens', 'podcastCategories'));
+        return view('frontend.podcast', compact('podcasts', 'totalListens', 'podcastCategories'));
     }
 
     public function create()

@@ -11,6 +11,8 @@ Route::get('/', [\App\Http\Controllers\BlogsController::class, 'blogs'])->name('
 Route::get('/blogs/{slug}', [\App\Http\Controllers\BlogsController::class, 'show'])->name('frontend.show');
 Route::get('/blogs/categories/{category}', [\App\Http\Controllers\BlogsController::class, 'showByCategory'])->name('frontend.showByCategory');
 Route::get('/blogs/tags/{tag}', [\App\Http\Controllers\BlogsController::class, 'showByTag'])->name('frontend.showByTag');
+
+// podcasts
 Route::get('/podcasts', [PodcastController::class, 'index'])->name('frontend.podcasts.index');
 Route::get('/podcast/{slug}', [PodcastController::class, 'show'])->name('frontend.podcasts.show');
 

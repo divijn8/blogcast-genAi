@@ -74,6 +74,11 @@ class User extends Authenticatable
         return $this->hasMany(Post::class, 'author_id');
     }
 
+    public function podcasts()
+    {
+        return $this->hasMany(Podcast::class, 'author_id');
+    }
+
     public function isAdmin(): bool
     {
         return $this->role === "admin";

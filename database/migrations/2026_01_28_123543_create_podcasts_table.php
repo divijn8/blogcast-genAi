@@ -16,10 +16,10 @@ return new class extends Migration
             $table->string('title');
             $table->string('slug')->unique();
             $table->text('description');
-            $table->json('script_json'); // Stores: [{"speaker": "Host", "text": "..."}, {"speaker": "Guest", "text": "..."}]
-            $table->string('audio_path'); // Final MP3 file
+            $table->json('script_json');
+            $table->string('audio_path');
             $table->string('thumbnail');;
-            $table->integer('duration')->default(0); // in seconds
+            $table->integer('duration')->default(0);
             $table->unsignedBigInteger('category_id');
             $table->unsignedBigInteger('author_id');
             $table->timestamp('published_at')->nullable();
