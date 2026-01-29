@@ -1,63 +1,178 @@
 @extends('frontend.layouts.app')
 
 @section('main-content')
-    <div class="container py-5">
-        @if(request()->query('search'))
-            <div class="row mb-4">
-                <div class="col-md-12">
-                    <h3 class="text-primary">Results for: <strong>{{ request()->query('search') }}</strong></h3>
-                </div>
+<style>
+.blog-card {
+    background: #fff;
+    border-radius: 18px;
+    overflow: hidden;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.06);
+    transition: all 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    margin-bottom: 50px;
+}
+
+.blog-card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 20px 40px rgba(0,0,0,0.12);
+}
+
+.blog-thumb {
+    height: 200px;
+    overflow: hidden;
+}
+
+.blog-thumb img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.blog-body {
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+.blog-title {
+    font-size: 16px;
+    font-weight: 700;
+    line-height: 1.4;
+
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    min-height: 44px;
+}
+
+.blog-title a {
+    color: #212529;
+    text-decoration: none;
+}
+
+.blog-title a:hover {
+    color: #0d6efd;
+}
+
+.blog-meta {
+    font-size: 12px;
+    color: #6c757d;
+    margin-top: 6px;
+}
+
+.blog-excerpt {
+    margin-top: 10px;
+    font-size: 13px;
+    color: #555;
+    line-height: 1.5;
+
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+
+    min-height: 63px;
+    max-height: 63px;
+}
+
+.blog-body .btn {
+    margin-top: auto;
+}
+
+.btn-read {
+    border: 1.5px solid #0d6efd;
+    color: #0d6efd;
+    background: transparent;
+    font-size: 13px;
+    font-weight: 600;
+    padding: 8px 14px;
+    border-radius: 999px;
+    transition: all 0.25s ease;
+}
+
+.btn-read:hover {
+    background: #0d6efd;
+    color: #fff;
+    transform: translateY(-1px);
+}
+</style>
+
+<div class="container py-5">
+
+    @if(request()->query('search'))
+        <div class="row mb-4">
+            <div class="col-md-12">
+                <h3 class="text-primary">
+                    Results for: <strong>{{ request()->query('search') }}</strong>
+                </h3>
             </div>
-        @endif
+        </div>
+    @endif
 
-        <div class="row">
-            <div class="col-lg-9 col-md-8 mt25">
-                <div class="row">
-                    @foreach ($posts as $post)
-                        <div class="col-md-4 col-sm-6 mb-4 mt20">
-                            <div class="card shadow-md h-100 d-flex flex-column" style="min-height: 420px;">
-                                <!-- Image -->
-                                <img src="{{ asset($post->thumbnail_path) }}" class="card-img-top" alt="Blog Image"
-                                    style="object-fit: cover; height: 200px; width: 100%;">
+    <div class="row">
 
-                                <div class="card-body d-flex flex-column">
-                                    <!-- Blog Title -->
-                                    <h5 class="card-title" style="min-height: 50px;">
-                                        <a href="{{ route('frontend.show', $post->slug) }}" class="text-decoration-none text-dark">
-                                            {{$post->title}}
-                                        </a>
-                                    </h5>
+        <div class="col-lg-9 col-md-8 mt25">
+            <div class="row">
 
-                                    <!-- Date & Author -->
-                                    <p class="text-muted small">
-                                        <i class="fa fa-calendar"></i> {{ $post->created_at->format('F j, Y') }} |
-                                        <i class="fa fa-user"></i> <a href="#" class="text-decoration-none">{{ $post->author->name }}</a>
-                                    </p>
+                @foreach ($posts as $post)
+                    <div class="col-lg-4 col-md-6 col-sm-12 mb-4">
 
-                                    <!-- Excerpt -->
-                                    <p class="card-text" style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-height: 40px;">
-                                        {{ Str::limit($post->excerpt, 200) }}
-                                    </p>
+                        <div class="blog-card">
 
-                                    <!-- Read More Button (aligned at bottom) -->
-                                    <a href="{{ route('frontend.show', $post->slug) }}" class="btn btn-primary btn-sm mb-4">
-                                        Read More <i class="fa fa-arrow-right"></i>
-                                    </a>
-                                </div>
+                            <div class="blog-thumb">
+                                <img src="{{ asset($post->thumbnail_path) }}" alt="{{ $post->title }}">
                             </div>
+
+                            <div class="blog-body">
+
+                                <h5 class="blog-title">
+                                    <a href="{{ route('frontend.show', $post->slug) }}">
+                                        {{ $post->title }}
+                                    </a>
+                                </h5>
+
+                                <p class="blog-meta">
+                                    <i class="fa fa-calendar me-1"></i>
+                                    {{ $post->created_at->format('F j, Y') }}
+                                    &nbsp;•&nbsp;
+                                    <i class="fa fa-user me-1"></i>
+                                    {{ $post->author->name }}
+                                </p>
+
+                                <p class="blog-excerpt">
+                                    {{ $post->excerpt }}
+                                </p>
+
+                                <a href="{{ route('frontend.show', $post->slug) }}"
+                                   class="btn btn-read w-100 mt-3">
+                                    Read Article →
+                                </a>
+
+                            </div>
+
                         </div>
-                    @endforeach
-                </div>
-            </div>
 
-            <!-- Sidebar -->
-            <div class="col-lg-3 col-md-4">
+                    </div>
+                @endforeach
+
             </div>
         </div>
 
-        <!-- Pagination -->
-        <div class="d-flex justify-content-center mt-4">
-            {{ $posts->appends(request()->query())->links('frontend.partials._pagination') }}
+        {{-- SIDEBAR --}}
+        <div class="col-lg-3 col-md-4">
+            {{-- sidebar handled globally --}}
         </div>
+
     </div>
+
+    {{-- Pagination --}}
+    <div class="d-flex justify-content-center mt-4">
+        {{ $posts->appends(request()->query())->links('frontend.partials._pagination') }}
+    </div>
+
+</div>
 @endsection

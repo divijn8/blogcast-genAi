@@ -25,6 +25,14 @@ class Podcast extends Model
         $this->attributes['slug'] = Str::slug($title);
     }
 
+    public function getThumbnailPathAttribute() {
+        return 'storage/'.$this->thumbnail;
+    }
+
+    public function getUrlAttribute() {
+        return asset("podcasts/{$this->slug}");
+    }
+
     public function category() {
         return $this->belongsTo(Category::class);
     }
