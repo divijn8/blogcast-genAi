@@ -28,16 +28,41 @@ class PodcastController extends Controller
 
     public function store(Request $request)
     {
-        $data = $request->validate([
+        $request->validate([
             'title' => 'required',
             'description' => 'required',
             'category_id' => 'required',
-            'thumbnail' => 'image|mimes:jpeg,png,jpg',
+            // 'script_json' => 'required', // Ensure it's not empty
         ]);
+        $podcast = new Podcast();
+        $podcast->title = $request->title;
+        $podcast->description = $request->description;
+        $podcast->category_id = $request->category_id;
+        $podcast->author_id = auth()->id();
 
-        // File handling logic similar to your PostsController...
-        Podcast::create($data + ['author_id' => auth()->id()]);
+        // Yahan zaroori hai: string ko array mein convert karna agar model mein cast hai
+        $podcast->script_json = json_decode($request->script_json, true);
 
-        return redirect()->route('podcasts.index')->with('success', 'Podcast created successfully!');
+        if ($request->hasFile('thumbnail')) {
+            $podcast->thumbnail = $request->file('thumbnail')->store('podcasts/thumbnails', 'public');
+        }
+
+        // Audio path handle karein (dummy ya upload)
+        $podcast->audio_path = 'podcasts/default.mp3';
+
+        $podcast->save();
+
+        return redirect()->route('admin.podcasts.index')->with('success', 'Podcast created!');
+    }
+
+    public function drafts()
+    {
+        $authUser = auth()->user();
+        $podcasts = Podcast::with('category')
+                    ->where('author_id', $authUser->id)
+                    ->where('published_at', null)
+                    ->latest('updated_at')
+                    ->paginate(10);
+        return view("admin.podcasts.drafts", compact('podcasts'));
     }
 }

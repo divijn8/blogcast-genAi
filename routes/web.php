@@ -28,6 +28,7 @@ Route::prefix('admin')->name('admin.')->middleware(['auth'])->group(function () 
     Route::resource('podcasts', PodcastController::class);
 
     Route::get('/blogs/drafts', [BlogsController::class, 'drafts'])->name('posts.drafts');
+    Route::get('/podcasts/drafts', [PodcastController::class, 'drafts'])->name('podcasts.drafts');
 
     Route::put('/blogs/{blog}/publish',[BlogsController::class, 'publishBlog'])->name('posts.publish');
 
@@ -49,6 +50,7 @@ Route::prefix('admin')->name('admin.')->middleware(['auth'])->group(function () 
     // AI Blog Architect
     Route::post('/ai/analyze', [\App\Http\Controllers\AiController::class, 'analyze'])->name('ai.analyze');
     Route::post('/ai/generate', [\App\Http\Controllers\AiController::class, 'generate'])->name('ai.generate');
+    // Route::post('/ai/generate', [\App\Http\Controllers\AiController::class, 'generate'])->name('ai.generate');
 
 });
 

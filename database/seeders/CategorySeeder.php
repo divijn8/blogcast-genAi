@@ -3,19 +3,29 @@
 namespace Database\Seeders;
 
 use App\Models\Category;
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Str;
 
 class CategorySeeder extends Seeder
 {
-    /**
-     * Run the database seeds.
-     */
     public function run(): void
     {
-        $categories = collect(['Sports', 'Technology', 'Fashion', 'Entertainment', 'Food','Plants','Cyber','Politics']);
-        $categories->each(function($categoryName) {
-            Category::create(['name' => $categoryName]);
-        });
+        $categories = ['Technology', 'Lifestyle', 'Business', 'Health'];
+
+        foreach ($categories as $cat) {
+            Category::updateOrCreate(
+                ['slug' => Str::slug($cat)],
+                [
+                    'name' => $cat,
+                    'type' => 'blog' // <--- Yeh add karna zaroori hai
+                ]
+            );
+        }
+
+        // Podcast ki categories bhi yahi add kar sakte ho testing ke liye
+        Category::updateOrCreate(
+            ['slug' => 'ai-podcasts'],
+            ['name' => 'AI Podcasts', 'type' => 'podcast']
+        );
     }
 }

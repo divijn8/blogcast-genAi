@@ -12,7 +12,11 @@ class Tag extends Model
     protected $fillable = ['name'];
 
     public function posts() {
-        return $this->belongsToMany(Post::class);
+        return $this->morphedByMany(Post::class, 'taggable');
+    }
+
+    public function podcasts() {
+        return $this->morphedByMany(Podcast::class, 'taggable');
     }
 
 }

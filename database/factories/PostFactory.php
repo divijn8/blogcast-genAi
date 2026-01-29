@@ -19,10 +19,11 @@ class PostFactory extends Factory
     public function definition(): array
     {
         return [
-           'title' => fake()->sentence,
+            'title' => fake()->sentence,
             'excerpt' => fake()->paragraph,
             'body' => fake()->paragraphs(random_int(5, 8), true),
-            'category_id' => Category::all('id')->random()->id,
+            'category_id' => Category::where('type', 'blog')->inRandomOrder()->first()?->id
+                             ?? Category::factory()->create(['type' => 'blog'])->id,
             'thumbnail' => 'thumbnails/' . random_int(1, 35) . ".jpg",
             'published_at' => Carbon::now(),
         ];

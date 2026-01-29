@@ -16,7 +16,7 @@ return new class extends Migration
             $table->string('title');
             $table->string('slug')->unique();
             $table->text('description');
-            $table->json('script_json');
+            $table->json('script_json')->nullable();
             $table->string('audio_path');
             $table->string('thumbnail');;
             $table->integer('duration')->default(0);

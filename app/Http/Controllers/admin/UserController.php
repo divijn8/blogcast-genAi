@@ -107,15 +107,16 @@ class UserController extends Controller
                 ->first();
         }
 
-        $mostUsedTags= DB::table('post_tag')
-                     ->join('tags', 'post_tag.tag_id', '=', 'tags.id')
-                     ->join('posts', 'post_tag.post_id', '=', 'posts.id')
-                     ->where('posts.author_id', $userId)
-                     ->select('tags.name', DB::raw('count(*) as count'))
-                     ->groupBy('tags.name')
-                     ->orderByDesc('count')
-                     ->limit(5)
-                     ->get();
+        $mostUsedTags= DB::table('taggables')
+                    ->join('tags', 'taggables.tag_id', '=', 'tags.id')
+                    ->join('posts', 'taggables.taggable_id', '=', 'posts.id')
+                    ->where('taggables.taggable_type', 'App\Models\Post') // Yeh zaroori hai polymorphic mein
+                    ->where('posts.author_id', $userId)
+                    ->select('tags.name', DB::raw('count(*) as count'))
+                    ->groupBy('tags.id', 'tags.name') // Group by ID is safer in SQL
+                    ->orderByDesc('count')
+                    ->limit(5)
+                    ->get();
 
         $mostUsedCategories= DB::table('posts')
                      ->where('posts.author_id',$userId)
@@ -146,6 +147,6 @@ class UserController extends Controller
                                 ->first(),
         ];
 
-        return view('admin.dashboard', compact('postCount', 'totalViewCount', 'articlesRemaining','subscriptionStatus','mostUsedCategories','mostUsedTags','subscriptionPlan','totalArticles, podcastStats'));
+        return view('admin.dashboard', compact('postCount', 'totalViewCount', 'articlesRemaining','subscriptionStatus','mostUsedCategories','mostUsedTags','subscriptionPlan','totalArticles', 'podcastStats'));
     }
 }

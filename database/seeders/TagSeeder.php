@@ -3,20 +3,20 @@
 namespace Database\Seeders;
 
 use App\Models\Tag;
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Str;
 
 class TagSeeder extends Seeder
 {
-    /**
-     * Run the database seeds.
-     */
     public function run(): void
     {
-        $tags = collect(['Java', 'PHP', 'Laravel', 'Framework', 'Programming', 'Cricket', 'F1', 'Football', 'Coding','Hacking','Rose']);
-        $tags->each(function($tagName) {
-            Tag::create(['name' => $tagName]);
-        });
+        $tags = ['Laravel', 'AI', 'Coding', 'Maharashtra', 'Startups'];
 
+        foreach ($tags as $tag) {
+            Tag::firstOrCreate(
+                ['slug' => Str::slug($tag)],
+                ['name' => $tag]
+            );
+        }
     }
 }

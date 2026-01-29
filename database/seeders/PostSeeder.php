@@ -4,22 +4,18 @@ namespace Database\Seeders;
 
 use App\Models\Post;
 use App\Models\Tag;
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
 class PostSeeder extends Seeder
 {
-    /**
-     * Run the database seeds.
-     */
     public function run(): void
     {
-        Post::factory(100)
-            ->create()
-            ->each(function($post){
-                $post->tags()->attach(
-                    Tag::all()->random(random_int(2,5))
-                );
-            });
+        $tags = Tag::all();
+
+        Post::factory()->count(10)->create()->each(function ($post) use ($tags) {
+            $post->tags()->sync(
+                $tags->random(rand(2, 4))->pluck('id')->toArray()
+            );
+        });
     }
 }

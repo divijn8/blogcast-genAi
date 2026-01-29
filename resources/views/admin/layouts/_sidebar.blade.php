@@ -48,11 +48,6 @@
                     Create Blog
                 </a>
 
-                <a class="collapse-item {{ \App\Helpers\RoutingHelper::isPostIndex() ? 'active' : '' }}"
-                   href="{{ route('admin.posts.comments') }}">
-                    Comments
-                </a>
-
                 <a class="collapse-item {{ \App\Helpers\RoutingHelper::isPostDraft() ? 'active' : '' }}"
                    href="{{ route('admin.posts.drafts') }}">
                     Draft Blogs
@@ -84,22 +79,17 @@
 
              <div class="bg-white py-2 collapse-inner rounded">
                 <a class="collapse-item {{ \App\Helpers\RoutingHelper::isPostCreate() ? 'active' : '' }}"
-                   href="{{ route('admin.posts.create') }}">
+                   href="{{ route('admin.podcasts.create') }}">
                     Create Podcast
                 </a>
 
-                <a class="collapse-item {{ \App\Helpers\RoutingHelper::isPostIndex() ? 'active' : '' }}"
-                   href="{{ route('admin.posts.comments') }}">
-                    Comments
-                </a>
-
                 <a class="collapse-item {{ \App\Helpers\RoutingHelper::isPostDraft() ? 'active' : '' }}"
-                   href="{{ route('admin.posts.drafts') }}">
+                   href="{{ route('admin.podcasts.drafts') }}">
                     Draft Podcasts
                 </a>
 
                 <a class="collapse-item {{ \App\Helpers\RoutingHelper::isPostIndex() ? 'active' : '' }}"
-                   href="{{ route('admin.posts.index') }}">
+                   href="{{ route('admin.podcasts.index') }}">
                     Show All Podcasts
                 </a>
             </div>
@@ -114,6 +104,11 @@
     <div class="sidebar-heading">
         Addons
     </div>
+
+    <li class="nav-item {{ request()->routeIs('admin.users.*') ? 'active' : '' }}">
+        <a class="collapse-item {{ \App\Helpers\RoutingHelper::isPostIndex() ? 'active' : '' }}"
+            href="{{ route('admin.posts.comments') }}"> Comments </a>
+    </li>
 
     <!-- Categories -->
     <li class="nav-item {{ \App\Helpers\RoutingHelper::isCategoryRoute() ? 'active' : '' }}">

@@ -13,14 +13,14 @@ return new class extends Migration
     {
         Schema::create('comments', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('post_id')->constrained()->onDelete('cascade');
-            $table->foreignId('user_id')->constrained()->onDelete('cascade')->nullable();
-            $table->text('content');
-            $table->string('guest_name')->nullable();
-            $table->string('guest_email')->nullable();
-            $table->foreignId('parent_id')->nullable()->constrained('comments')->onDelete('cascade');
-            $table->unsignedBigInteger('approved_by')->constrained('users')->onDelete('cascade')->nullable();
+            $table->text('comment');
+            $table->unsignedBigInteger('user_id');
+            // Post/Podcast generic setup
+            $table->unsignedBigInteger('commentable_id');
+            $table->string('commentable_type');
             $table->timestamps();
+
+            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
         });
     }
 
