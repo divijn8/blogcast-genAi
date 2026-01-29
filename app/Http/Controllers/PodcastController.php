@@ -32,7 +32,6 @@ class PodcastController extends Controller
             'title' => 'required',
             'description' => 'required',
             'category_id' => 'required',
-            // 'script_json' => 'required', // Ensure it's not empty
         ]);
         $podcast = new Podcast();
         $podcast->title = $request->title;
