@@ -136,11 +136,40 @@
 @section('page-level-scripts')
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script>
+        $('.select2').select2();
 
+        flatpickr("#published_at", {
+            enableTime: true,
+            time_24hr: true,
+
+            defaultDate: null,
+            minDate: "today",
+
+            altInput: true,
+            altFormat: "F j, Y H:i",
+            dateFormat: "Y-m-d H:i",
+
+            onOpen: function(selectedDates, dateStr, instance) {
+                const now = new Date();
+
+                // Disable past time for today
+                if (instance.selectedDates.length) {
+                    const selected = instance.selectedDates[0];
+                    if (selected.toDateString() === now.toDateString()) {
+                        instance.set('minTime', now);
+                    } else {
+                        instance.set('minTime', '00:00');
+                    }
+                } else {
+                    instance.set('minTime', now);
+                }
+            }
+        });
+
+    </script>
     <script>
         $(document).ready(function() {
-            $('.select2').select2();
-            flatpickr("#published_at", { enableTime: true, dateFormat: "Y-m-d H:i" });
 
             // AI Modal Trigger
             $('#btn-ai-podcast-agent').on('click', function() {
@@ -156,7 +185,7 @@
                 $('#ai-loading').show();
 
                 $.ajax({
-                    url: "{{ route('admin.podcasts.index') }}", // Create this route in web.php
+                    url: "{{ route('admin.podcasts.index') }}",
                     method: "POST",
                     data: {
                         _token: "{{ csrf_token() }}",
@@ -179,15 +208,12 @@
 
                         $('#ai-results-view').append(scriptHtml);
 
-                        // Save script to form
-                        // Jab user "Use This Script" par click kare
                         $('#use-this-script').click(function() {
-                            let scriptData = res.script; // res.script ek array hona chahiye
+                            let scriptData = res.script;
 
                             $('#title').val(res.title);
                             $('#description').val(res.description);
 
-                            // UI update karo
                             $('#script-container').empty();
                             scriptData.forEach(line => {
                                 $('#script-container').append(`
@@ -198,8 +224,6 @@
                                 `);
                             });
 
-                            // 🔥 Sabse important: Hidden input mein JSON string dalo
-                            // Iska name 'script_json' hona chahiye jo controller dhund raha hai
                             $('#script_json_input').val(JSON.stringify(scriptData));
 
                             $('#aiPodcastModal').modal('hide');

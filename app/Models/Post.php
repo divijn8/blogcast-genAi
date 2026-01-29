@@ -14,7 +14,7 @@ class Post extends Model
     protected $fillable=['title','slug','excerpt','author_id','body','thumbnail','category_id', 'published_at'];
 
      // Accessors:for consistent and customized data presentation.
-     public function getThumbnailPathAttribute() {
+    public function getThumbnailPathAttribute() {
         return 'storage/'.$this->thumbnail;
     }
 

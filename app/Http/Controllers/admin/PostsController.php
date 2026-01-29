@@ -68,7 +68,6 @@ class PostsController extends Controller
         }
 
         $data['author_id'] = auth()->id();
-
         $post = Post::create($data);
 
         if ($request->filled('tags')) {

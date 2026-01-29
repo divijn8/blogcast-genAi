@@ -4,20 +4,23 @@ namespace App\Http\Controllers;
 
 use App\Models\Podcast;
 use App\Models\Category;
+use App\Models\Tag;
 use Illuminate\Http\Request;
 
 class PodcastController extends Controller
 {
     public function index()
     {
-        $podcasts = Podcast::with('category')->latest()->paginate(10);
+        $podcasts = Podcast::with(['category', 'tags'])->latest()->paginate(10);
         $totalListens = Podcast::sum('view_count');
-        $podcastCategories = Category::where('type', 'podcast')->withCount('podcasts')->get();
+        $categories = Category::where('type', 'podcast')->withCount('podcasts')->get();
 
         if (request()->is('admin/*')) {
             return view('admin.podcasts.index', compact('podcasts'));
         }
-        return view('frontend.podcast', compact('podcasts', 'totalListens', 'podcastCategories'));
+
+        $tags = Tag::whereHas('podcasts')->get();
+        return view('frontend.podcast', compact('podcasts', 'totalListens', 'categories', 'tags'));
     }
 
     public function create()
@@ -39,16 +42,14 @@ class PodcastController extends Controller
         $podcast->category_id = $request->category_id;
         $podcast->author_id = auth()->id();
 
-        // Yahan zaroori hai: string ko array mein convert karna agar model mein cast hai
         $podcast->script_json = json_decode($request->script_json, true);
 
         if ($request->hasFile('thumbnail')) {
             $podcast->thumbnail = $request->file('thumbnail')->store('podcasts/thumbnails', 'public');
         }
-
-        // Audio path handle karein (dummy ya upload)
-        $podcast->audio_path = 'podcasts/default.mp3';
-
+        if ($request->hasFile('audio_file')) {
+            $podcast->audio_path = $request->file('audio_file')->store('podcasts/audios', 'public');
+        }
         $podcast->save();
 
         return redirect()->route('admin.podcasts.index')->with('success', 'Podcast created!');
