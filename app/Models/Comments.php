@@ -9,24 +9,48 @@ class Comments extends Model
     protected $table = 'comments';
     protected $guarded = [];
 
-    public function post(){
-        return $this->belongsTo(Post::class, 'post_id');
+    /*
+    |--------------------------------------------------------------------------
+    | Relationships
+    |--------------------------------------------------------------------------
+    */
+
+    // Polymorphic parent (Post / Podcast / future models)
+    public function commentable()
+    {
+        return $this->morphTo();
     }
 
-    public function user(){
+    // Registered user
+    public function user()
+    {
         return $this->belongsTo(User::class);
     }
 
-    public function parent(){
-        return $this->belongsTo(Comments::class,'parent_id');
+    // Parent comment (for replies)
+    public function parent()
+    {
+        return $this->belongsTo(Comments::class, 'parent_id');
     }
 
-    public function replies(){
-        return $this->hasMany(Comments::class,'parent_id');
+    // Replies
+    public function replies()
+    {
+        return $this->hasMany(Comments::class, 'parent_id');
     }
 
-    public function getGuestProfileAttribute() {
-        $url = "https://ui-avatars.com/api/?name={$this->guest_name}&background=random&rounded=true&bold=true&format=svg";
-        return $this->profile_pic ? "storage/{$this->profile_pic}" : $url;
+    /*
+    |--------------------------------------------------------------------------
+    | Accessors
+    |--------------------------------------------------------------------------
+    */
+
+    public function getGuestProfileAttribute()
+    {
+        if ($this->profile_pic) {
+            return "storage/{$this->profile_pic}";
+        }
+
+        return "https://ui-avatars.com/api/?name={$this->guest_name}&background=random&rounded=true&bold=true&format=svg";
     }
 }

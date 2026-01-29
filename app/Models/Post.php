@@ -41,8 +41,9 @@ class Post extends Model
         return asset("blogs/{$this->slug}");
     }
 
-    public function comments() {
-        return $this->hasMany(Comments::class)->with('user', 'replies');
+    public function comments()
+    {
+        return $this->morphMany(Comments::class, 'commentable');
     }
 
     public function scopePublished($query) {

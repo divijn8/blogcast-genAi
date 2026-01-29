@@ -13,14 +13,40 @@ return new class extends Migration
     {
         Schema::create('comments', function (Blueprint $table) {
             $table->id();
-            $table->text('comment');
-            $table->unsignedBigInteger('user_id');
-            // Post/Podcast generic setup
+
+            // Polymorphic parent (Post / Podcast / future)
             $table->unsignedBigInteger('commentable_id');
             $table->string('commentable_type');
+
+            // Comment body
+            $table->text('comment');
+
+            // Auth user
+            $table->foreignId('user_id')
+                ->nullable()
+                ->constrained()
+                ->onDelete('cascade');
+
+            // Guest support
+            $table->string('guest_name')->nullable();
+            $table->string('guest_email')->nullable();
+
+            // Replies
+            $table->foreignId('parent_id')
+                ->nullable()
+                ->constrained('comments')
+                ->onDelete('cascade');
+
+            // Moderation
+            $table->foreignId('approved_by')
+                ->nullable()
+                ->constrained('users')
+                ->onDelete('cascade');
+
             $table->timestamps();
 
-            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
+            // Optional but good
+            $table->index(['commentable_id', 'commentable_type']);
         });
     }
 

@@ -69,17 +69,28 @@
             {{-- Show top-level comments --}}
             @include('frontend.partials.comments', ['comments' => $post->comments->whereNull('parent_id')])
 
-            <form action="{{ route('comments.store', $post->id) }}" method="POST">
+            <form action="{{ route('comments.store') }}" method="POST">
                 @csrf
+
                 @guest
                     <div class="row" style="margin: 10px">
-                        <input type="text" name="name" class="col-md-6 blog-leave-comment-input" placeholder="name" style="margin-left: -10px; margin-right: 10px">
-                        <input type="email" name="email" class="col-md-6 blog-leave-comment-input" placeholder="email">
+                        <input type="text" name="guest_name" class="col-md-6 blog-leave-comment-input" placeholder="name">
+                        <input type="email" name="guest_email" class="col-md-6 blog-leave-comment-input" placeholder="email">
                     </div>
                 @endguest
-                <textarea name="content" class="form-control mb-2" rows="5"  placeholder="Write a comment..." class="blog-leave-comment-textarea"></textarea>
 
-                <button type="submit" class="button button-pasific button-sm center-block mb25">Leave Comment</button>
+                <input type="hidden" name="commentable_type" value="post">
+                <input type="hidden" name="commentable_id" value="{{ $post->id }}">
+
+                <textarea name="comment"
+                        class="form-control mb-2 blog-leave-comment-textarea"
+                        rows="5"
+                        placeholder="Write a comment..."
+                        required></textarea>
+
+                <button type="submit" class="button button-pasific button-sm center-block mb25">
+                    Leave Comment
+                </button>
             </form>
         </div>
 

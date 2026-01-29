@@ -81,6 +81,6 @@ class RoutingHelper
     }
 
     public static function isCommentsIndex() {
-        return Route::is('admin.posts.comments');
+        return Route::is(['admin.comments.index']);
     }
 }

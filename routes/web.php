@@ -17,7 +17,6 @@ Route::get('/podcasts', [PodcastController::class, 'index'])->name('frontend.pod
 Route::get('/podcast/{slug}', [PodcastController::class, 'show'])->name('frontend.podcasts.show');
 
 Route::prefix('admin')->name('admin.')->middleware(['auth'])->group(function () {
-    Route::get('/posts/comments', [CommentController::class, 'index'])->name('posts.comments');
     //for tags
     Route::resource('tags', \App\Http\Controllers\admin\TagsController::class)->except(['show']);
     //for posts
@@ -40,8 +39,16 @@ Route::prefix('admin')->name('admin.')->middleware(['auth'])->group(function () 
     Route::put('categories/{category}', [\App\Http\Controllers\admin\CategoriesController::class, 'update'])->name('categories.update');
     Route::delete('categories/{category}', [\App\Http\Controllers\admin\CategoriesController::class, 'destroy'])->name('categories.destroy');
 
-    Route::put('/posts/comments/{comment}/approve',[CommentController::class, 'approve'])->name('posts.comments.approve');
-    Route::put('/posts/comments/{comment}/unapprove',[CommentController::class, 'unapprove'])->name('posts.comments.unapprove');
+    Route::prefix('comments')->name('comments.')->group(function () {
+        Route::get('/', [App\Http\Controllers\CommentController::class, 'index'])
+            ->name('index');
+
+        Route::put('{comment}/approve', [App\Http\Controllers\CommentController::class, 'approve'])
+            ->name('approve');
+
+        Route::put('{comment}/unapprove', [App\Http\Controllers\CommentController::class, 'unapprove'])
+            ->name('unapprove');
+    });
 
     Route::get('dashboard',
         [\App\Http\Controllers\admin\UserController::class,'dashboard']
@@ -63,7 +70,8 @@ Route::middleware(['auth'])->group((function() {
     Route::get('/subscriptions/cancel',[\App\Http\Controllers\admin\SubscriptionController::class,'cancel'])->name('subscription.cancel');
 }));
 
-Route::post('/posts/{post}/comments', [App\Http\Controllers\CommentController::class, 'store'])->name('comments.store');
+Route::post('/comments', [CommentController::class, 'store'])->name('comments.store');
+
 
 Auth::routes();
 

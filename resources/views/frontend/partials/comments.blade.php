@@ -4,8 +4,12 @@
 @endphp
 
 @foreach ($comments as $comment)
-   <div class="blog-post-comment {{ $depthClass }} {{ $comment->parent_id ? 'blog-post-comment-reply' : '' }}">
-        <img src="{{ $comment->user->user_profile ?? $comment->guest_profile }}" class="img-circle" alt="image">
+    <div class="blog-post-comment {{ $depthClass }} {{ $comment->parent_id ? 'blog-post-comment-reply' : '' }}">
+    <img src="{{ $comment->user->user_profile ?? $comment->guest_profile }}"
+        class="img-circle mr-2"
+        alt="image"
+        width="50"
+        height="40">
         <span class="blog-post-comment-name">{{ $comment->guest_name ?? $comment->user->name }}</span>
         {{ $comment->created_at->format('M. d Y, h:i A') }}
         <a href="#" class="pull-right text-gray reply-button" data-comment-id="{{ $comment->id }}">
@@ -16,18 +20,33 @@
 
         {{-- Reply form --}}
         <div class="reply-form mt-2" id="reply-form-{{ $comment->id }}" style="display: none;">
-            <form action="{{ route('comments.store', $comment->post_id) }}" method="POST">
+            <form action="{{ route('comments.store') }}" method="POST">
                 @csrf
+
+                <input type="hidden" name="commentable_type"
+                    value="{{ $comment->commentable instanceof App\Models\Post ? 'post' : 'podcast' }}">
+
+                <input type="hidden" name="commentable_id"
+                    value="{{ $comment->commentable->id }}">
+
                 <input type="hidden" name="parent_id" value="{{ $comment->id }}">
+
                 @guest
                     <div class="row" style="margin: 10px">
-                        <input type="text" name="name" class="col-md-6 blog-leave-comment-input" placeholder="name" style="margin-left: -10px; margin-right: 10px">
-                        <input type="email" name="email" class="col-md-6 blog-leave-comment-input" placeholder="email">
+                        <input type="text" name="guest_name" class="col-md-6 blog-leave-comment-input" placeholder="name">
+                        <input type="email" name="guest_email" class="col-md-6 blog-leave-comment-input" placeholder="email">
                     </div>
                 @endguest
-                <textarea name="content" class="form-control mb-2" rows="2" placeholder="Write a reply..." required></textarea>
 
-                <button type="submit" class="button button-pasific button-sm center-block mb25">Reply</button>
+                <textarea name="comment"
+                        class="form-control mb-2"
+                        rows="2"
+                        placeholder="Write a reply..."
+                        required></textarea>
+
+                <button type="submit" class="button button-pasific button-sm center-block mb25">
+                    Reply
+                </button>
             </form>
         </div>
 

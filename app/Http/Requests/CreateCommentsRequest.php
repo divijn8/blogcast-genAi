@@ -6,32 +6,32 @@ use Illuminate\Foundation\Http\FormRequest;
 
 class CreateCommentsRequest extends FormRequest
 {
-    /**
-     * Determine if the user is authorized to make this request.
-     */
     public function authorize(): bool
     {
         return true;
     }
 
-    /**
-     * Get the validation rules that apply to the request.
-     *
-     * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array|string>
-     */
     public function rules(): array
     {
         $guestRules = [];
 
-        if(! auth()->check()) {
+        if (! auth()->check()) {
             $guestRules = [
-                'name' => 'required | min:3 | max:255',
-                'email' => 'required | email | max:255'
+                'guest_name'  => 'required|min:3|max:255',
+                'guest_email' => 'required|email|max:255',
             ];
         }
+
         return array_merge([
-            'content' => 'required | min:2',
-            'parent_id'=>'nullable|exists:comments,id'
+            // MAIN COMMENT
+            'comment' => 'required|string|min:2',
+
+            // POLYMORPHIC
+            'commentable_type' => 'required|in:post,podcast',
+            'commentable_id'   => 'required|integer',
+
+            // REPLIES
+            'parent_id' => 'nullable|exists:comments,id',
         ], $guestRules);
     }
 }

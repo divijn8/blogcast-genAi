@@ -106,7 +106,7 @@
     </div>
 
     <li class="nav-item {{ \App\Helpers\RoutingHelper::isCommentsIndex() ? 'active' : '' }}">
-        <a class="nav-link" href="{{ route('admin.posts.comments') }}">
+        <a class="nav-link" href="{{ route('admin.comments.index') }}">
             <i class="fas fa-fw fa-comments"></i>
             <span>Comments</span>
         </a>
