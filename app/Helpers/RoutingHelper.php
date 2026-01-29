@@ -41,7 +41,7 @@ class RoutingHelper
     }
 
     public static function isPostRoute() {
-        return self::isPostEdit() || self::isPostCreate() || self::isPostIndex() || self::isPostDraft() || self::isPostComment();
+        return self::isPostEdit() || self::isPostCreate() || self::isPostIndex() || self::isPostDraft();
     }
 
     public static function isPostCreate() {
@@ -60,7 +60,27 @@ class RoutingHelper
         return Route::is(['admin.posts.drafts']);
     }
 
-    public static function isPostComment() {
-        return Route::is(['admin.posts.comment']);
+    public static function isPodcastRoute() {
+        return self::isPodcastEdit() || self::isPodcastCreate() || self::isPodcastIndex() || self::isPodcastDraft();
+    }
+
+    public static function isPodcastCreate() {
+        return Route::is(['admin.podcasts.create']);
+    }
+
+    public static function isPodcastIndex() {
+        return Route::is(['admin.podcasts.index']);
+    }
+
+    public static function isPodcastEdit() {
+        return Route::is(['admin.podcasts.edit']);
+    }
+
+    public static function isPodcastDraft() {
+        return Route::is(['admin.podcasts.drafts']);
+    }
+
+    public static function isCommentsIndex() {
+        return Route::is('admin.posts.comments');
     }
 }

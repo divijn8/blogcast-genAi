@@ -63,8 +63,8 @@
 
     </li>
 
-    <li class="nav-item {{ \App\Helpers\RoutingHelper::isPostRoute() ? 'active' : '' }}">
-        <a class="nav-link {{ \App\Helpers\RoutingHelper::isPostRoute() ? '' : 'collapsed' }}"
+    <li class="nav-item {{ \App\Helpers\RoutingHelper::isPodcastRoute() ? 'active' : '' }}">
+        <a class="nav-link {{ \App\Helpers\RoutingHelper::isPodcastRoute() ? '' : 'collapsed' }}"
            href="#"
            data-toggle="collapse"
            data-target="#collapsePodcasts">
@@ -74,21 +74,21 @@
         </a>
 
         <div id="collapsePodcasts"
-             class="collapse {{ \App\Helpers\RoutingHelper::isPostRoute() ? 'show' : '' }}"
+             class="collapse {{ \App\Helpers\RoutingHelper::isPodcastRoute() ? 'show' : '' }}"
              data-parent="#accordionSidebar">
 
              <div class="bg-white py-2 collapse-inner rounded">
-                <a class="collapse-item {{ \App\Helpers\RoutingHelper::isPostCreate() ? 'active' : '' }}"
+                <a class="collapse-item {{ \App\Helpers\RoutingHelper::isPodcastCreate() ? 'active' : '' }}"
                    href="{{ route('admin.podcasts.create') }}">
                     Create Podcast
                 </a>
 
-                <a class="collapse-item {{ \App\Helpers\RoutingHelper::isPostDraft() ? 'active' : '' }}"
+                <a class="collapse-item {{ \App\Helpers\RoutingHelper::isPodcastDraft() ? 'active' : '' }}"
                    href="{{ route('admin.podcasts.drafts') }}">
                     Draft Podcasts
                 </a>
 
-                <a class="collapse-item {{ \App\Helpers\RoutingHelper::isPostIndex() ? 'active' : '' }}"
+                <a class="collapse-item {{ \App\Helpers\RoutingHelper::isPodcastIndex() ? 'active' : '' }}"
                    href="{{ route('admin.podcasts.index') }}">
                     Show All Podcasts
                 </a>
@@ -105,9 +105,11 @@
         Addons
     </div>
 
-    <li class="nav-item {{ request()->routeIs('admin.users.*') ? 'active' : '' }}">
-        <a class="collapse-item {{ \App\Helpers\RoutingHelper::isPostIndex() ? 'active' : '' }}"
-            href="{{ route('admin.posts.comments') }}"> Comments </a>
+    <li class="nav-item {{ \App\Helpers\RoutingHelper::isCommentsIndex() ? 'active' : '' }}">
+        <a class="nav-link" href="{{ route('admin.posts.comments') }}">
+            <i class="fas fa-fw fa-comments"></i>
+            <span>Comments</span>
+        </a>
     </li>
 
     <!-- Categories -->
