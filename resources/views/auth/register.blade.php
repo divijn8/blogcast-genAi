@@ -90,8 +90,8 @@
     }
     /* Ensure form-floating labels don't get overwritten by old bootstrap */
     .form-floating > .form-control {
-        height: calc(3.5rem + 2px) !important;
-        padding: 1rem 0.75rem !important;
+        height: calc(3.8rem + 2px) !important;
+        padding: 1.25rem 0.75rem 0.5rem !important;
     }
     .form-floating > label {
         padding: 1rem 0.75rem !important;
