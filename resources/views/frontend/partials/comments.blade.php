@@ -16,7 +16,7 @@
             <i class="fa fa-comment"></i> Reply
         </a>
 
-        <p>{{ $comment->content }}</p>
+        <p>{{ $comment->comment }}</p>
 
         {{-- Reply form --}}
         <div class="reply-form mt-2" id="reply-form-{{ $comment->id }}" style="display: none;">
@@ -32,14 +32,14 @@
                 <input type="hidden" name="parent_id" value="{{ $comment->id }}">
 
                 @guest
-                    <div class="row" style="margin: 10px">
-                        <input type="text" name="guest_name" class="col-md-6 blog-leave-comment-input" placeholder="name">
-                        <input type="email" name="guest_email" class="col-md-6 blog-leave-comment-input" placeholder="email">
+                    <div class="row" style="margin: 2px">
+                        <input type="text" name="guest_name" class="form-control col-md-6 blog-leave-comment-input" placeholder="name">
+                        <input type="email" name="guest_email" class="form-control col-md-6 blog-leave-comment-input" placeholder="email">
                     </div>
                 @endguest
 
                 <textarea name="comment"
-                        class="form-control mb-2"
+                        class="form-control mt-2 mb-2"
                         rows="2"
                         placeholder="Write a reply..."
                         required></textarea>

@@ -73,7 +73,7 @@
                 @csrf
 
                 @guest
-                    <div class="row" style="margin: 10px">
+                    <div class="row" style="margin-left: 3px">
                         <input type="text" name="guest_name" class="col-md-6 blog-leave-comment-input" placeholder="name">
                         <input type="email" name="guest_email" class="col-md-6 blog-leave-comment-input" placeholder="email">
                     </div>

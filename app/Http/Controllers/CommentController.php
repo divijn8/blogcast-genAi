@@ -49,6 +49,7 @@ class CommentController extends Controller
             if (auth()->user()->isAdmin()) {
                 $data['approved_by'] = auth()->id();
             }
+
         } else {
             $data['guest_name']  = $request->guest_name;
             $data['guest_email'] = $request->guest_email;
