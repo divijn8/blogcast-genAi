@@ -25,8 +25,9 @@ class PodcastController extends Controller
 
     public function create()
     {
-        $categories = Category::where('type', 'podcast')->get();
-        return view('admin.podcasts.create', compact('categories'));
+        $categories = Category::all();
+        $tags = Tag::all();
+        return view('admin.podcasts.create', compact(['categories', 'tags']));
     }
 
     public function store(Request $request)
