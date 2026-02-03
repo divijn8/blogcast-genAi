@@ -37,7 +37,7 @@
 
         <div class="row">
             {{-- LEFT COLUMN: Details --}}
-            <div class="col-lg-8">
+            <div class="col-lg-7">
                 <div class="studio-card">
                     <div class="studio-header">
                         <h4 class="mb-0 font-weight-bold text-dark">New Podcast</h4>
@@ -104,14 +104,14 @@
             </div>
 
             {{-- RIGHT COLUMN: Actions & Script Preview --}}
-            <div class="col-lg-4">
+            <div class="col-lg-5">
                 <div class="sticky-summary">
                     <div class="studio-card shadow-lg">
                         <div class="card-body">
                             <button type="submit" class="btn btn-primary btn-block btn-glow mb-3">
                                 <i class="fas fa-paper-plane mr-2"></i> PUBLISH EPISODE
                             </button>
-                            <button type="button" class="btn btn-light btn-block font-weight-bold text-muted mb-4">
+                            <button type="button" name="status" value="draft" class="btn btn-light btn-block font-weight-bold text-muted mb-4">
                                 SAVE AS DRAFT
                             </button>
 
@@ -174,6 +174,11 @@
                 </div>
 
                 <div id="ai-results-view" style="display:none;">
+                    <div id="ai-options-view" style="display:none;">
+                        <h5 class="text-center font-weight-bold mb-4">Choose a Direction</h5>
+                        <div class="row" id="options-container">
+                            </div>
+                    </div>
                     <h5 class="font-weight-bold mb-3">Proposed Script</h5>
                     <div id="script-preview-list" class="mb-4 p-3 bg-light rounded" style="max-height: 350px; overflow-y: auto;"></div>
                     <button class="btn btn-success btn-block btn-lg btn-glow" id="use-this-script">Apply to Studio</button>
@@ -197,6 +202,11 @@
     // 1. MODAL TRIGGER
     $('#btn-ai-podcast-agent').on('click', function() {
         $('#aiPodcastModal').modal('show');
+        $('#ai-input-view').show();
+        $('#ai-loading').hide();
+        $('#ai-results-view').hide();
+        $('#ai-options-view').hide();
+        $('#script-preview-list').empty();
     });
 
     // 2. THUMBNAIL PREVIEW (FIXED)
@@ -221,78 +231,114 @@
     });
 
     // 4. AI SCRIPT GENERATION
+    // 1. GENERATE OPTIONS (Step 1)
     $('#btn-generate-script').on('click', function() {
         let topic = $('#ai_topic').val();
         let speakers = $('#ai_speakers').val();
 
-        if(!topic) {
-            alert('Please enter a topic or URL');
-            return;
-        }
-
-        // UI State: Loading
         $('#ai-input-view').hide();
-        $('#ai-loading').show();
+        $('#ai-loading').show().find('h4').text('Designing Podcast Concepts...');
 
-        $.ajax({
-            url: "{{ route('admin.podcasts.index') }}", // Ensure this route handles POST for AI
-            method: "POST",
-            data: {
-                _token: "{{ csrf_token() }}",
-                topic: topic,
-                speakers: speakers
-            },
-            success: function(res) {
-                $('#ai-loading').hide();
-                $('#ai-results-view').show();
+        $.post("{{ route('admin.ai.podcast.analyze') }}", {
+            _token: "{{ csrf_token() }}",
+            topic: topic,
+            speakers: speakers
+        }, function(res) {
+            $('#ai-loading').hide();
+            $('#ai-results-view').show();   
+            $('#ai-options-view').show();
 
-                let previewHtml = "";
-                res.script.forEach(line => {
-                    previewHtml += `
-                        <div class="p-2 border-bottom mb-2">
-                            <strong class="text-primary small">${line.speaker.toUpperCase()}</strong>
-                            <p class="mb-0 small">${line.text}</p>
-                        </div>`;
-                });
-                $('#script-preview-list').html(previewHtml);
-
-                // Use This Script Button Logic
-                $('#use-this-script').off('click').on('click', function() {
-                    // Fill Title & Description
-                    $('#title').val(res.title);
-                    $('#description').val(res.description);
-
-                    // Clear and Fill Studio Timeline
-                    $('#script-container').empty();
-                    res.script.forEach(line => {
-                        $('#script-container').append(`
-                            <div class="script-bubble">
-                                <span class="speaker-tag">${line.speaker}</span>
-                                <p class="mb-0 small text-dark">${line.text}</p>
-                            </div>
-                        `);
-                    });
-
-                    // Set hidden input for form submission
-                    $('#script_json_input').val(JSON.stringify(res.script));
-
-                    // Reset UI
-                    $('#aiPodcastModal').modal('hide');
-                    $('#no-script-text').hide();
-
-                    // Reset modal for next use
-                    setTimeout(() => {
-                        $('#ai-results-view').hide();
-                        $('#ai-input-view').show();
-                    }, 500);
-                });
-            },
-            error: function() {
-                alert('Generation failed. Please try again.');
-                $('#ai-loading').hide();
-                $('#ai-input-view').show();
-            }
+            let cardsHtml = '';
+            res.options.forEach(opt => {
+                cardsHtml += `
+                    <div class="col-md-4">
+                        <div class="card p-3 mb-3 shadow-sm h-100 option-card" style="cursor:pointer; border:2px solid #eee;" onclick="selectOption(this, ${JSON.stringify(opt).replace(/"/g, '&quot;')})">
+                            <span class="badge badge-primary mb-2">${opt.difficulty}</span>
+                            <h6 class="font-weight-bold">${opt.title}</h6>
+                            <p class="small text-muted">${opt.tone}</p>
+                            <hr>
+                            <p class="small text-dark" style="font-size:0.8rem">${opt.structure_outline}</p>
+                        </div>
+                    </div>`;
+            });
+            $('#options-container').html(cardsHtml);
         });
+    });
+
+    // 2. GENERATE SCRIPT (Step 2 - Triggered by Card Click)
+    window.selectOption = function(el, optionData) {
+        $('.option-card').css('border-color', '#eee');
+        $(el).css('border-color', '#4e73df'); // Highlight selected
+
+        $('#ai-options-view').hide();
+        $('#ai-loading').show().find('h4').text('Writing Script & Dialogue...');
+
+        $.post("{{ route('admin.ai.podcast.script') }}", {
+            _token: "{{ csrf_token() }}",
+            title: optionData.title,
+            structure_outline: optionData.structure_outline,
+            speakers: $('#ai_speakers').val()
+        }, function(res) {
+            // ... (Existing logic to render script into #script-preview-list) ...
+
+            // Add "Generate Audio" Button to the preview view
+            $('#use-this-script').text('Use Script & Generate Audio');
+
+            $('#ai-loading').hide();
+            $('#ai-results-view').show();
+
+            // Render script lines...
+            let previewHtml = '';
+            res.script.forEach(line => {
+                previewHtml += `
+                    <div class="mb-2 small">
+                        <strong>${line.speaker}:</strong> ${line.text}
+                    </div>
+                `;
+            });
+            $('#script-preview-list').html(previewHtml);
+
+
+            // Store the script globally to send later
+            window.currentScript = res.script;
+        });
+    };
+
+    function fillStudioUI(script) {
+        $('#script-container').empty();
+        script.forEach(line => {
+            $('#script-container').append(`
+                <div class="script-bubble">
+                    <span class="speaker-tag">${line.speaker}</span>
+                    <p class="mb-0 small text-dark">${line.text}</p>
+                </div>
+            `);
+        });
+
+        $('#script_json_input').val(JSON.stringify(script));
+        $('#no-script-text').hide();
+    }
+
+    // 3. GENERATE AUDIO (Step 3 - Final Apply)
+    $('#use-this-script').on('click', function() {
+        // Fill the UI with text immediately
+        fillStudioUI(window.currentScript);
+
+        // Start Audio Generation in background
+        alert('Generating Audio... This may take a minute.');
+
+        $.post("{{ route('admin.ai.podcast.audio') }}", {
+            _token: "{{ csrf_token() }}",
+            script: window.currentScript
+        }, function(res) {
+            alert('Audio Generated!');
+            // Update the file input text or hidden input with the URL
+            $('#audio-name').html(`<i class="fas fa-check-circle text-success"></i> Generated Audio Ready`);
+            // You might need a hidden input for audio_url if you aren't using the file input
+            $('<input>').attr({type: 'hidden', name: 'generated_audio_url', value: res.audio_url}).appendTo('#podcastForm');
+        });
+
+        $('#aiPodcastModal').modal('hide');
     });
 
     // 5. SELECT2 & FLAT PICKR RE-INIT

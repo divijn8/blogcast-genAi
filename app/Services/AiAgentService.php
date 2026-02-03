@@ -2,6 +2,8 @@
 
 namespace App\Services;
 
+use Illuminate\Support\Facades\Storage;
+
 class AiAgentService
 {
     protected $firecrawl;
@@ -127,5 +129,54 @@ Rules:
 - Do NOT use <html>, <head> or <body> tags.
 - Make it engaging and detailed.
 PROMPT;
+    }
+
+    public function prompt(string $prompt, bool $json = true)
+    {
+        return $this->groq->ask(
+            "You are a professional podcast producer.",
+            $prompt,
+            $json
+        );
+    }
+
+    public function synthesizeConversation(array $script)
+    {
+        $client = new \GuzzleHttp\Client();
+        $apiKey = env('ELEVENLABS_API_KEY');
+
+        // Map speakers to Voice IDs (You can find these in ElevenLabs Dashboard)
+        $voices = [
+            'Host' => 'hpp4J3VqNfWAUOO0d1Us', // Example ID for "Charlie"
+            'Guest' => 'CwhRBWXzGAHq8TQ4Fs17', // Example ID for "Rachel"
+            'Expert' => 'EXAVITQu4vr4xnSDxMaL'  // Example ID for "Clyde"
+        ];
+
+        $audioSegments = [];
+
+        // Loop through script lines (Simple approach)
+        foreach ($script as $index => $line) {
+            $voiceId = $voices[$line['speaker']] ?? $voices['Host'];
+
+            $response = $client->post("https://api.elevenlabs.io/v1/text-to-speech/{$voiceId}", [
+                'headers' => [
+                    'xi-api-key' => $apiKey,
+                    'Content-Type' => 'application/json',
+                ],
+                'json' => [
+                    'text' => $line['text'],
+                    'model_id' => 'eleven_monolingual_v1',
+                    'voice_settings' => ['stability' => 0.5, 'similarity_boost' => 0.75]
+                ]
+            ]);
+
+            $fileName = "temp_segment_{$index}.mp3";
+            Storage::disk('public')->put("temp/$fileName", $response->getBody());
+            $audioSegments[] = public_path("storage/temp/$fileName");
+        }
+
+        // MERGING: In production, use FFMpeg to merge these files.
+        // For now, we will just return the first one or a dummy merged file.
+        return asset('storage/temp/' . basename($audioSegments[0]));
     }
 }

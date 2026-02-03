@@ -26,6 +26,12 @@ Route::prefix('admin')->name('admin.')->middleware(['auth'])->group(function () 
     //for podcast
     Route::resource('podcasts', PodcastController::class);
 
+    Route::prefix('ai/podcast')->name('ai.podcast.')->group(function () {
+        Route::post('/analyze', [\App\Http\Controllers\AiController::class, 'analyzePodcast'])->name('analyze');
+        Route::post('/script', [\App\Http\Controllers\AiController::class, 'generatePodcastScript'])->name('script');
+        Route::post('/audio', [\App\Http\Controllers\AiController::class, 'generatePodcastAudio'])->name('audio');
+    });
+
     Route::get('/blogs/drafts', [BlogsController::class, 'drafts'])->name('posts.drafts');
     Route::get('/podcasts/drafts', [PodcastController::class, 'drafts'])->name('podcasts.drafts');
 

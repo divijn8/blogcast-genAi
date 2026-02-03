@@ -71,4 +71,55 @@ class AiController extends Controller
             ], 500);
         }
     }
+
+    public function analyzePodcast(Request $request)
+    {
+        $request->validate(['topic' => 'required', 'speakers' => 'required|integer']);
+
+        $prompt = "You are a podcast producer. Create 3 distinct concepts for a {$request->speakers}-person podcast episode about: '{$request->topic}'.
+
+        Return a JSON array(options) with 3 objects. Each object must have:
+        - 'title': A catchy title.
+        - 'tone': e.g., 'Humorous', 'Serious Debate', 'Beginner Guide'.
+        - 'structure_outline': A brief description of the flow.
+        - 'difficulty': 'Beginner', 'Intermediate', or 'Expert'.
+
+        Output ONLY valid JSON.";
+
+        $result = $this->aiService->prompt($prompt);
+        return response()->json([
+            'options' => $result['options']
+        ]);
+    }
+
+    public function generatePodcastScript(Request $request)
+    {
+        $request->validate(['title' => 'required', 'structure_outline' => 'required', 'speakers' => 'required']);
+
+        $prompt = "Write a full podcast script for '{$request->title}'.
+        Structure: {$request->structure_outline}.
+        Format: A {$request->speakers}-person conversation.
+        Language can be english or hinglish.
+
+        IMPORTANT: Return a JSON array(script) of objects.
+        Each object must be: { 'speaker': 'Host' | 'Guest' | 'Expert', 'text': 'The spoken text' }.
+        Make it sound natural, include fillers like 'Hmm', 'Exactly', 'Wow'.";
+
+        $script = $this->aiService->prompt($prompt);
+
+        return response()->json($script);
+    }
+
+    public function generatePodcastAudio(Request $request)
+    {
+        $request->validate(['script' => 'required|array']);
+
+        $audioUrl = $this->aiService->synthesizeConversation(
+            $request->script
+        );
+
+        return response()->json([
+            'audio_url' => $audioUrl
+        ]);
+    }
 }
