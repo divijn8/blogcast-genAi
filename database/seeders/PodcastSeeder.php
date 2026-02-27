@@ -30,9 +30,9 @@ class PodcastSeeder extends Seeder
             'description' => 'A conversational deep dive into how AI is impacting local tech hubs like Mumbai and Pune.',
             'category_id' => $category->id,
             'author_id' => $admin->id,
-            'audio_path' => 'podcasts/sample-audio.mp3', // Make sure this dummy path is there
-            'thumbnail' => 'https://via.placeholder.com/640x480.png/004466?text=AI+Podcast',
-            'duration' => 450, // 7.5 minutes
+            'audio_path' => 'podcasts\audios\podcast_1770794130.wav', //
+            'thumbnail' => 'thumbnails/1.jpg',
+            'duration' => 337, // 7.5 minutes
             'published_at' => now(),
             'view_count' => mt_rand(100, 5000),
             'script_json' => [
