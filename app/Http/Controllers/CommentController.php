@@ -84,6 +84,10 @@ class CommentController extends Controller
             'approved_by' => null,
         ]);
 
+        $comment->replies()->update([
+            'approved_by' => null,
+        ]);
+
         return redirect()
             ->route('admin.comments.index')
             ->with('success', 'Comment unapproved');

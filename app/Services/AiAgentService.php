@@ -3,6 +3,9 @@
 namespace App\Services;
 
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Log;
+use Exception;
+use Symfony\Component\Process\Process;
 
 class AiAgentService
 {
@@ -15,75 +18,44 @@ class AiAgentService
         $this->groq = $groq;
     }
 
-    /**
-     * MAIN ENTRY POINT: Research & Analyze
-     */
-    public function researchStructures($title, $excerpt)
-    {
+    public function researchStructures($title, $excerpt) {
         $urls = $this->firecrawl->search("blog post about $title $excerpt", 6);
-
         $sources = [];
         foreach ($urls as $url) {
             $data = $this->firecrawl->scrape($url);
-            if ($data) {
-                $sources[] = $data;
-            }
-            if (count($sources) >= 4) break; // Limit sources
+            if ($data) $sources[] = $data;
+            if (count($sources) >= 4) break;
         }
-
-        $structures = $this->analyzeStructures($title, $excerpt, $sources);
-
-        return [
-            'structures' => $structures,
-            'sources'    => $sources
-        ];
+        return ['structures' => $this->analyzeStructures($title, $excerpt, $sources), 'sources' => $sources];
     }
 
-    /**
-     * Generate final HTML content
-     */
-    public function generateContent($title, $excerpt, $structureOutline)
-    {
+    public function generateContent($title, $excerpt, $structureOutline) {
         $systemMsg = "Act as a professional technical writer. Do not use Markdown.";
         $prompt = $this->getWritingPrompt($title, $excerpt, $structureOutline);
-
         $content = $this->groq->ask($systemMsg, $prompt, false);
-
         return $content ?: '<p>Could not generate content. Please try again.</p>';
     }
 
-    private function analyzeStructures($title, $excerpt, $sources)
-    {
+    private function analyzeStructures($title, $excerpt, $sources) {
         $context = $this->buildContextString($sources);
-
         $systemMsg = "You are a Content Strategist. Output STRICT JSON only.";
         $prompt = $this->getStructurePrompt($title, $excerpt, $context);
-
         $response = $this->groq->ask($systemMsg, $prompt, true);
-
-        if (empty($response) || empty($response['structures'])) {
-            return $this->getFallbackStructures();
-        }
-
-        return $response['structures'];
+        return $response['structures'] ?? $this->getFallbackStructures();
     }
 
-    private function buildContextString(array $sources): string
-    {
+    private function buildContextString(array $sources): string {
         if (empty($sources)) return "No specific competitors found.";
-
         $context = "";
         foreach ($sources as $source) {
             preg_match_all('/^(#{1,3}\s.*)$/m', $source['markdown'], $matches);
-            $headings = implode("\n", array_slice($matches[0], 0, 30));
-
+            $headings = implode("\n", array_slice($matches[0], 30));
             $context .= "Source: {$source['title']}\nStructure:\n{$headings}\n\n";
         }
         return $context;
     }
 
-    private function getFallbackStructures()
-    {
+    private function getFallbackStructures() {
         return [
             ['id' => 1, 'name' => 'The Complete Guide', 'badge' => 'Comprehensive', 'outline' => "1. Introduction\n2. Understanding the Basics\n3. Step-by-Step Implementation\n4. Common Pitfalls\n5. Conclusion"],
             ['id' => 2, 'name' => 'Quick & Actionable', 'badge' => 'Fast Read', 'outline' => "Introduction\nTip 1: Quick Win\nTip 2: The Core Strategy\nTip 3: Automation\nSummary"],
@@ -92,8 +64,7 @@ class AiAgentService
         ];
     }
 
-    private function getStructurePrompt($title, $excerpt, $context)
-    {
+    private function getStructurePrompt($title, $excerpt, $context) {
         return <<<PROMPT
 Topic: "{$title}" ({$excerpt})
 Competitor patterns found:
@@ -114,8 +85,7 @@ Format:
 PROMPT;
     }
 
-    private function getWritingPrompt($title, $excerpt, $outline)
-    {
+    private function getWritingPrompt($title, $excerpt, $outline) {
         return <<<PROMPT
 Topic: {$title}
 Excerpt: {$excerpt}
@@ -133,50 +103,117 @@ PROMPT;
 
     public function prompt(string $prompt, bool $json = true)
     {
-        return $this->groq->ask(
-            "You are a professional podcast producer.",
-            $prompt,
-            $json
-        );
+        return $this->groq->ask("You are a professional podcast producer.", $prompt, $json);
     }
 
+    /**
+     * GENERATE AUDIO: Host = Female, Expert/Guest = Male
+     */
     public function synthesizeConversation(array $script)
     {
-        $client = new \GuzzleHttp\Client();
-        $apiKey = env('ELEVENLABS_API_KEY');
+        $piperDir = storage_path('app/piper');
+        $piperExe = $piperDir . '\piper.exe';
+        $tempDir  = storage_path('app/public/temp');
 
-        // Map speakers to Voice IDs (You can find these in ElevenLabs Dashboard)
-        $voices = [
-            'Host' => 'hpp4J3VqNfWAUOO0d1Us', // Example ID for "Charlie"
-            'Guest' => 'CwhRBWXzGAHq8TQ4Fs17', // Example ID for "Rachel"
-            'Expert' => 'EXAVITQu4vr4xnSDxMaL'  // Example ID for "Clyde"
-        ];
+        // Check Folder
+        if (!is_dir($piperDir)) throw new Exception("Piper Folder Missing at: $piperDir");
 
-        $audioSegments = [];
+        // --- DEFINE MODELS ---
+        // These file names must match what you downloaded
+        $femaleModel = $piperDir . '\en_US-libritts-high.onnx'; // Host (Sarah)
+        $maleModel   = $piperDir . '\en_US-ryan-medium.onnx';    // Expert (Michael)
 
-        // Loop through script lines (Simple approach)
+        // Fallback: If exact files are missing, grab whatever ONNX files are there
+        $allOnnx = glob($piperDir . '\*.onnx');
+        if(empty($allOnnx)) throw new Exception("No .onnx voice models found in piper folder.");
+
+        if (!file_exists($femaleModel)) $femaleModel = $allOnnx[0];
+        if (!file_exists($maleModel))   $maleModel = isset($allOnnx[1]) ? $allOnnx[1] : $allOnnx[0];
+
+        // Create Temp Dir
+        if (!file_exists($tempDir)) mkdir($tempDir, 0777, true);
+
+        $tempFiles = [];
+        $errors = [];
+
         foreach ($script as $index => $line) {
-            $voiceId = $voices[$line['speaker']] ?? $voices['Host'];
+            $text = trim(str_replace(['"', "'", "\n", "\r"], ' ', $line['text']));
+            if(empty($text)) continue;
 
-            $response = $client->post("https://api.elevenlabs.io/v1/text-to-speech/{$voiceId}", [
-                'headers' => [
-                    'xi-api-key' => $apiKey,
-                    'Content-Type' => 'application/json',
-                ],
-                'json' => [
-                    'text' => $line['text'],
-                    'model_id' => 'eleven_monolingual_v1',
-                    'voice_settings' => ['stability' => 0.5, 'similarity_boost' => 0.75]
-                ]
-            ]);
+            // --- VOICE SELECTION LOGIC ---
+            $speaker = strtolower($line['speaker'] ?? 'host');
 
-            $fileName = "temp_segment_{$index}.mp3";
-            Storage::disk('public')->put("temp/$fileName", $response->getBody());
-            $audioSegments[] = public_path("storage/temp/$fileName");
+            // If speaker is "Host", use Female. Anyone else (Guest/Expert), use Male.
+            $currentModel = ($speaker === 'host') ? $femaleModel : $maleModel;
+
+            $outputFile = $tempDir . "\segment_{$index}.wav";
+
+            try {
+                $process = new Process([
+                    $piperExe,
+                    '--model', $currentModel,
+                    '--output_file', $outputFile
+                ]);
+
+                $process->setInput($text);
+                $process->setTimeout(60);
+                $process->run();
+
+                if ($process->isSuccessful() && file_exists($outputFile) && filesize($outputFile) > 0) {
+                    $tempFiles[] = $outputFile;
+                } else {
+                    $errors[] = "Line $index Failed: " . $process->getErrorOutput();
+                }
+            } catch (Exception $e) {
+                $errors[] = "Process Exception: " . $e->getMessage();
+            }
         }
 
-        // MERGING: In production, use FFMpeg to merge these files.
-        // For now, we will just return the first one or a dummy merged file.
-        return asset('storage/temp/' . basename($audioSegments[0]));
+        if (empty($tempFiles)) {
+            $firstError = !empty($errors) ? $errors[0] : "Unknown error.";
+            throw new Exception("Audio Generation Failed. Details: " . $firstError);
+        }
+
+        // Merge
+        $finalWavData = $this->mergeWavFiles($tempFiles);
+        $finalFileName = 'podcast_' . time() . '.wav';
+
+        // Save to public storage
+        Storage::disk('public')->put("temp/$finalFileName", $finalWavData);
+
+        // Cleanup segments
+        foreach ($tempFiles as $f) @unlink($f);
+
+        return asset("storage/temp/$finalFileName");
+    }
+
+    private function mergeWavFiles(array $files)
+    {
+        if (empty($files)) return null;
+
+        $dataLength = 0;
+        $audioData = '';
+        $firstHeader = '';
+
+        foreach ($files as $i => $file) {
+            $contents = file_get_contents($file);
+            if (strlen($contents) < 44) continue;
+
+            $header = substr($contents, 0, 44);
+            $body = substr($contents, 44);
+
+            if ($i === 0) $firstHeader = $header;
+
+            $audioData .= $body;
+            $dataLength += strlen($body);
+        }
+
+        if (!$firstHeader) return null;
+
+        $newHeader = $firstHeader;
+        $newHeader = substr_replace($newHeader, pack('V', $dataLength), 40, 4);
+        $newHeader = substr_replace($newHeader, pack('V', 36 + $dataLength), 4, 4);
+
+        return $newHeader . $audioData;
     }
 }

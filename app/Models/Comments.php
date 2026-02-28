@@ -36,7 +36,9 @@ class Comments extends Model
     // Replies
     public function replies()
     {
-        return $this->hasMany(Comments::class, 'parent_id');
+        return $this->hasMany(Comments::class, 'parent_id')
+        ->whereNotNull('approved_by')
+        ->latest();
     }
 
     /*

@@ -111,7 +111,16 @@
                 </h3>
             </div>
         </div>
+    @else
+        <div class="row mb-4">
+            <div class="col-md-12">
+                <h3 class="text-primary">
+                    Showing Blogs: <strong>{{ $paginatedCount }} out of {{ $count }}</strong>
+                </h3>
+            </div>
+        </div>
     @endif
+
 
     <div class="row">
 

@@ -43,7 +43,8 @@ class Post extends Model
 
     public function comments()
     {
-        return $this->morphMany(Comments::class, 'commentable');
+        return $this->morphMany(Comments::class, 'commentable')->whereNotNull('approved_by')
+        ->latest();
     }
 
     public function scopePublished($query) {

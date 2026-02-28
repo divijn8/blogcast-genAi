@@ -497,7 +497,7 @@
 
         flatpickr("#published_at", {
             enableTime: true,
-            time_24hr: true,
+            time_24hr: false,
 
             defaultDate: null,
             minDate: "today",
