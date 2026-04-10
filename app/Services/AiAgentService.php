@@ -109,83 +109,83 @@ PROMPT;
     /**
      * GENERATE AUDIO: Host = Female, Expert/Guest = Male
      */
-    public function synthesizeConversation(array $script)
-    {
-        $piperDir = storage_path('app/piper');
-        $piperExe = $piperDir . '\piper.exe';
-        $tempDir  = storage_path('app/public/temp');
+    // public function synthesizeConversation(array $script)
+    // {
+    //     $piperDir = storage_path('app/piper');
+    //     $piperExe = $piperDir . '\piper.exe';
+    //     $tempDir  = storage_path('app/public/temp');
 
-        // Check Folder
-        if (!is_dir($piperDir)) throw new Exception("Piper Folder Missing at: $piperDir");
+    //     // Check Folder
+    //     if (!is_dir($piperDir)) throw new Exception("Piper Folder Missing at: $piperDir");
 
-        // --- DEFINE MODELS ---
-        // These file names must match what you downloaded
-        $femaleModel = $piperDir . '\en_US-libritts-high.onnx'; // Host (Sarah)
-        $maleModel   = $piperDir . '\en_US-ryan-medium.onnx';    // Expert (Michael)
+    //     // --- DEFINE MODELS ---
+    //     // These file names must match what you downloaded
+    //     $femaleModel = $piperDir . '\en_US-libritts-high.onnx'; // Host (Sarah)
+    //     $maleModel   = $piperDir . '\en_US-ryan-medium.onnx';    // Expert (Michael)
 
-        // Fallback: If exact files are missing, grab whatever ONNX files are there
-        $allOnnx = glob($piperDir . '\*.onnx');
-        if(empty($allOnnx)) throw new Exception("No .onnx voice models found in piper folder.");
+    //     // Fallback: If exact files are missing, grab whatever ONNX files are there
+    //     $allOnnx = glob($piperDir . '\*.onnx');
+    //     if(empty($allOnnx)) throw new Exception("No .onnx voice models found in piper folder.");
 
-        if (!file_exists($femaleModel)) $femaleModel = $allOnnx[0];
-        if (!file_exists($maleModel))   $maleModel = isset($allOnnx[1]) ? $allOnnx[1] : $allOnnx[0];
+    //     if (!file_exists($femaleModel)) $femaleModel = $allOnnx[0];
+    //     if (!file_exists($maleModel))   $maleModel = isset($allOnnx[1]) ? $allOnnx[1] : $allOnnx[0];
 
-        // Create Temp Dir
-        if (!file_exists($tempDir)) mkdir($tempDir, 0777, true);
+    //     // Create Temp Dir
+    //     if (!file_exists($tempDir)) mkdir($tempDir, 0777, true);
 
-        $tempFiles = [];
-        $errors = [];
+    //     $tempFiles = [];
+    //     $errors = [];
 
-        foreach ($script as $index => $line) {
-            $text = trim(str_replace(['"', "'", "\n", "\r"], ' ', $line['text']));
-            if(empty($text)) continue;
+    //     foreach ($script as $index => $line) {
+    //         $text = trim(str_replace(['"', "'", "\n", "\r"], ' ', $line['text']));
+    //         if(empty($text)) continue;
 
-            // --- VOICE SELECTION LOGIC ---
-            $speaker = strtolower($line['speaker'] ?? 'host');
+    //         // --- VOICE SELECTION LOGIC ---
+    //         $speaker = strtolower($line['speaker'] ?? 'host');
 
-            // If speaker is "Host", use Female. Anyone else (Guest/Expert), use Male.
-            $currentModel = ($speaker === 'host') ? $femaleModel : $maleModel;
+    //         // If speaker is "Host", use Female. Anyone else (Guest/Expert), use Male.
+    //         $currentModel = ($speaker === 'host') ? $femaleModel : $maleModel;
 
-            $outputFile = $tempDir . "\segment_{$index}.wav";
+    //         $outputFile = $tempDir . "\segment_{$index}.wav";
 
-            try {
-                $process = new Process([
-                    $piperExe,
-                    '--model', $currentModel,
-                    '--output_file', $outputFile
-                ]);
+    //         try {
+    //             $process = new Process([
+    //                 $piperExe,
+    //                 '--model', $currentModel,
+    //                 '--output_file', $outputFile
+    //             ]);
 
-                $process->setInput($text);
-                $process->setTimeout(60);
-                $process->run();
+    //             $process->setInput($text);
+    //             $process->setTimeout(60);
+    //             $process->run();
 
-                if ($process->isSuccessful() && file_exists($outputFile) && filesize($outputFile) > 0) {
-                    $tempFiles[] = $outputFile;
-                } else {
-                    $errors[] = "Line $index Failed: " . $process->getErrorOutput();
-                }
-            } catch (Exception $e) {
-                $errors[] = "Process Exception: " . $e->getMessage();
-            }
-        }
+    //             if ($process->isSuccessful() && file_exists($outputFile) && filesize($outputFile) > 0) {
+    //                 $tempFiles[] = $outputFile;
+    //             } else {
+    //                 $errors[] = "Line $index Failed: " . $process->getErrorOutput();
+    //             }
+    //         } catch (Exception $e) {
+    //             $errors[] = "Process Exception: " . $e->getMessage();
+    //         }
+    //     }
 
-        if (empty($tempFiles)) {
-            $firstError = !empty($errors) ? $errors[0] : "Unknown error.";
-            throw new Exception("Audio Generation Failed. Details: " . $firstError);
-        }
+    //     if (empty($tempFiles)) {
+    //         $firstError = !empty($errors) ? $errors[0] : "Unknown error.";
+    //         throw new Exception("Audio Generation Failed. Details: " . $firstError);
+    //     }
 
-        // Merge
-        $finalWavData = $this->mergeWavFiles($tempFiles);
-        $finalFileName = 'podcast_' . time() . '.wav';
+    //     // Merge
+    //     $finalWavData = $this->mergeWavFiles($tempFiles);
+    //     $finalFileName = 'podcast_' . time() . '.wav';
 
-        // Save to public storage
-        Storage::disk('public')->put("temp/$finalFileName", $finalWavData);
+    //     // Save to public storage
+    //     Storage::disk('public')->put("temp/$finalFileName", $finalWavData);
 
-        // Cleanup segments
-        foreach ($tempFiles as $f) @unlink($f);
+    //     // Cleanup segments
+    //     foreach ($tempFiles as $f) @unlink($f);
 
-        return asset("storage/temp/$finalFileName");
-    }
+    //     return asset("storage/temp/$finalFileName");
+    // }
 
     private function mergeWavFiles(array $files)
     {
@@ -215,5 +215,66 @@ PROMPT;
         $newHeader = substr_replace($newHeader, pack('V', 36 + $dataLength), 4, 4);
 
         return $newHeader . $audioData;
+    }
+
+    public function synthesizeConversation(array $script)
+    {
+        // 1. Setup - Time aur Memory badhao taaki crash na ho
+        ini_set('memory_limit', '512M');
+        set_time_limit(0); // Unlimited time for this request
+
+        $client = new \GuzzleHttp\Client(['timeout' => 60]);
+        $apiKey = env('ELEVENLABS_API_KEY');
+
+        // Voice IDs (Dashboard se match kar lena)
+        $voices = [
+            'Host'   => 'st8o4LADtfxckX2PH08x',
+            'Guest'  => 'aSFxChEgBmCyExpaDqHd',
+            'Expert' => 's0oIsoSJ9raiUm7DJNzW'
+        ];
+
+        $combinedBinary = '';
+        $timestamp = time();
+
+        try {
+            foreach ($script as $index => $line) {
+                $voiceId = $voices[$line['speaker']] ?? $voices['Host'];
+                $text = trim($line['text']);
+
+                if (empty($text)) continue;
+
+                $response = $client->post("https://api.elevenlabs.io/v1/text-to-speech/{$voiceId}", [
+                    'headers' => [
+                        'xi-api-key'   => $apiKey,
+                        'Content-Type' => 'application/json',
+                    ],
+                    'json' => [
+                        'text'           => $text,
+                        'model_id'       => 'eleven_multilingual_v2',
+                        'voice_settings' => ['stability' => 0.5, 'similarity_boost' => 0.75]
+                    ]
+                ]);
+
+                if ($response->getStatusCode() === 200) {
+                    $combinedBinary .= $response->getBody()->getContents();
+                } else {
+                    Log::error("ElevenLabs Line $index failed with status: " . $response->getStatusCode());
+                }
+            }
+
+            if (empty($combinedBinary)) {
+                throw new Exception("No audio data was generated from ElevenLabs.");
+            }
+
+            // 4. Final Save - Poori merged audio ko ek hi file mein save karo
+            $finalFileName = "podcast_full_{$timestamp}.mp3";
+            Storage::disk('public')->put("temp/{$finalFileName}", $combinedBinary);
+
+            return asset("storage/temp/{$finalFileName}");
+
+        } catch (Exception $e) {
+            Log::error("Audio Synthesis Critical Failure: " . $e->getMessage());
+            throw $e;
+        }
     }
 }

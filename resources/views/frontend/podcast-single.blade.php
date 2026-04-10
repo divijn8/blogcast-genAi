@@ -158,7 +158,7 @@
         </p>
 
         @if($podcast->tags->count() > 0)
-            <div style="margin-top: 20px;">
+            <div style="margin-top: 5px;">
                 @foreach($podcast->tags as $tag)
                     <span class="label label-default" style="margin-right: 5px;">#{{ $tag->name }}</span>
                 @endforeach
@@ -166,6 +166,39 @@
         @endif
     </div>
 </div>
+
+{{-- TRANSCRIPT --}}
+@if(!empty($podcast->script_json) && is_array($podcast->script_json))
+<div class="row mt50">
+    <div class="col-md-12">
+        <h4 class="section-heading">Transcript</h4>
+
+        <div class="chat-container clearfix">
+            @foreach($podcast->script_json as $line)
+                @php
+                    $speaker = strtolower($line['speaker'] ?? '');
+                    // Check if speaker is 'host' OR 'sarah' (based on your prompt)
+                    $isHost = ($speaker === 'host' || $speaker === 'sarah');
+                @endphp
+
+                @if($isHost)
+                    {{-- HOST BUBBLE --}}
+                    <div class="chat-bubble chat-left">
+                        <span class="speaker-name"><i class="fa fa-microphone"></i> {{ $line['speaker'] }}</span>
+                        {{ $line['text'] }}
+                    </div>
+                @else
+                    {{-- GUEST BUBBLE --}}
+                    <div class="chat-bubble chat-right">
+                        <span class="speaker-name">{{ $line['speaker'] }} <i class="fa fa-user"></i></span>
+                        {{ $line['text'] }}
+                    </div>
+                @endif
+            @endforeach
+        </div>
+    </div>
+</div>
+@endif
 
 <div class="mb50 mt50">
     <img src="{{ $podcast->author->user_profile }}" class="img-circle" alt="image">
@@ -237,39 +270,6 @@
 
     </script>
 
-
-{{-- TRANSCRIPT --}}
-@if(!empty($podcast->script_json) && is_array($podcast->script_json))
-<div class="row">
-    <div class="col-md-12">
-        <h4 class="section-heading">Transcript</h4>
-
-        <div class="chat-container clearfix">
-            @foreach($podcast->script_json as $line)
-                @php
-                    $speaker = strtolower($line['speaker'] ?? '');
-                    // Check if speaker is 'host' OR 'sarah' (based on your prompt)
-                    $isHost = ($speaker === 'host' || $speaker === 'sarah');
-                @endphp
-
-                @if($isHost)
-                    {{-- HOST BUBBLE --}}
-                    <div class="chat-bubble chat-left">
-                        <span class="speaker-name"><i class="fa fa-microphone"></i> {{ $line['speaker'] }}</span>
-                        {{ $line['text'] }}
-                    </div>
-                @else
-                    {{-- GUEST BUBBLE --}}
-                    <div class="chat-bubble chat-right">
-                        <span class="speaker-name">{{ $line['speaker'] }} <i class="fa fa-user"></i></span>
-                        {{ $line['text'] }}
-                    </div>
-                @endif
-            @endforeach
-        </div>
-    </div>
-</div>
-@endif
 
 <div class="text-center" style="margin-top: 50px; margin-bottom: 50px;">
     <a href="{{ route('frontend.podcasts.index') }}" class="btn btn-default btn-lg">
