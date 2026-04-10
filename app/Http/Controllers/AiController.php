@@ -62,6 +62,7 @@ class AiController extends Controller
 
         Return a JSON array(options) with 3 objects. Each object must have:
         - 'title': A catchy title.
+        - 'description': A short description (max 25 words)
         - 'tone': e.g., 'Humorous', 'Serious Debate', 'Beginner Guide'.
         - 'structure_outline': A brief description of the flow.
         - 'difficulty': 'Beginner', 'Intermediate', or 'Expert'.
@@ -69,8 +70,22 @@ class AiController extends Controller
         Output ONLY valid JSON.";
 
         $result = $this->aiService->prompt($prompt);
+        $options = $result['options'] ?? [];
+
+        $formatted = [];
+
+        foreach ($options as $item) {
+            $formatted[] = [
+                'title' => $item['title'] ?? '',
+                'description' => $item['description'] ?? '', // ✅ ADD THIS LINE
+                'tone' => $item['tone'] ?? '',
+                'structure_outline' => $item['structure_outline'] ?? '',
+                'difficulty' => $item['difficulty'] ?? '',
+            ];
+        }
+
         return response()->json([
-            'options' => $result['options']
+            'options' => $formatted
         ]);
     }
 

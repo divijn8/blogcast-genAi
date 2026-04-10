@@ -82,6 +82,34 @@ class PodcastController extends Controller
         return redirect()->route('admin.podcasts.index')->with('success', 'Podcast created successfully!');
     }
 
+    public function edit(Podcast $podcast)
+    {
+        $categories=Category::all();
+        $tags=Tag::all();
+        return view('admin.podcasts.edit',compact([
+            'podcast',
+            'categories',
+            'tags'
+        ]));
+    }
+
+    /**
+     * Update the specified resource in storage.
+     */
+    public function update(UpdatePodcastRequest $request, Podcast $podcast)
+    {
+        $data=$request->validated();
+        if($request->hasFile('thumbnail')) {
+            Storage::disk('public')->delete($podcast->thumbnail);
+            $data['thumbnail']=$request->file('thumbnail')->store('thumbnails','public');
+        }
+        $podcast->update($data);
+        $podcast->tags()->sync($request->tags);
+
+        return redirect()->route('admin.podcasts.index')
+                        ->with('success','Podcast updated successfully');
+    }
+
     public function show($slug)
     {
         $podcast = Podcast::where('slug', $slug)

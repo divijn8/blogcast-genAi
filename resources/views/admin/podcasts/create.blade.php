@@ -273,9 +273,9 @@
                         <button class="btn btn-success btn-block btn-lg btn-glow" id="use-this-script">
                             <i class="fas fa-robot mr-2"></i> Generate Audio (Host: Female, Guest: Male)
                         </button>
-                        <button class="btn btn-link btn-block text-muted" onclick="$('#ai-results-view').hide(); $('#ai-options-view').show();">
+                        {{-- <button class="btn btn-link btn-block text-muted" onclick="$('#ai-results-view').hide(); $('#ai-options-view').show();">
                             Back to Concepts
-                        </button>
+                        </button> --}}
                     </div>
 
                 </div>
@@ -422,6 +422,14 @@
 
             // Auto-fill Title
             $('#title').val(optionData.title);
+
+            // ✅ NEW: Auto-fill description
+            let shortDesc = optionData.description
+                || optionData.summary
+                || optionData.short_description
+                || optionData.title;
+
+            $('#description').val(shortDesc);
 
             $.post("{{ route('admin.ai.podcast.script') }}", {
                 _token: "{{ csrf_token() }}",
