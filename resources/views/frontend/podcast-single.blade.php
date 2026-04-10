@@ -167,7 +167,76 @@
     </div>
 </div>
 
-<hr style="margin: 40px 0;">
+<div class="mb50 mt50">
+    <img src="{{ $podcast->author->user_profile }}" class="img-circle" alt="image">
+    <span class="blog-post-author-name">{{ $podcast->author->name }}</span> <a href="https://twitter.com/booisme"><i class="fa fa-twitter"></i></a>
+</div>
+
+    {{--  Comments --}}
+    <div class="blog-post-comment-container">
+        <h5 id="comment"><i class="fa fa-comments-o mb25"></i> {{ $podcast->comments->whereNotNull('approved_by')->count() }} Comments</h5>
+
+        {{-- Show top-level comments --}}
+        @include('frontend.partials.comments', ['comments' => $podcast->comments->whereNotNull('approved_by')->whereNull('parent_id')])
+
+        <form action="{{ route('comments.store') }}" method="POST">
+            @csrf
+
+            @guest
+                <div class="row" style="margin-left: 3px">
+                    <input type="text" name="guest_name" class="col-md-6 blog-leave-comment-input" placeholder="name">
+                    <input type="email" name="guest_email" class="col-md-6 blog-leave-comment-input" placeholder="email">
+                </div>
+            @endguest
+
+            <input type="hidden" name="commentable_type" value="podcast">
+            <input type="hidden" name="commentable_id" value="{{ $podcast->id }}">
+
+            <textarea name="comment"
+                    class="form-control mb-2 blog-leave-comment-textarea"
+                    rows="5"
+                    placeholder="Write a comment..."
+                    required></textarea>
+
+            <button type="submit" class="button button-pasific button-sm center-block mb25">
+                Leave Comment
+            </button>
+        </form>
+    </div>
+
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            document.querySelectorAll('.reply-button').forEach(button => {
+                button.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    const commentId = this.dataset.commentId;
+                    const form = document.getElementById(`reply-form-${commentId}`);
+                    form.style.display = form.style.display === 'none' ? 'block' : 'none';
+                });
+            });
+        });
+    </script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            document.querySelectorAll('.toggle-replies-link').forEach(link => {
+                link.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    const target = document.querySelector(this.dataset.target);
+                    if (target.style.display === 'none') {
+                        target.style.display = 'block';
+                        this.textContent = 'Hide replies';
+                    } else {
+                        target.style.display = 'none';
+                        this.textContent = this.getAttribute('data-original');
+                    }
+                });
+                link.setAttribute('data-original', link.textContent);
+            });
+        });
+
+    </script>
+
 
 {{-- TRANSCRIPT --}}
 @if(!empty($podcast->script_json) && is_array($podcast->script_json))

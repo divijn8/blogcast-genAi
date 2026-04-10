@@ -56,18 +56,15 @@
     <div class="mb50">
         <img src="{{ $post->author->user_profile }}" class="img-circle" alt="image">
         <span class="blog-post-author-name">{{ $post->author->name }}</span> <a href="https://twitter.com/booisme"><i class="fa fa-twitter"></i></a>
-        <p>
-            {{-- A sport enthu and a Cricket fan. --}}
-        </p>
     </div>
 
         {{--  Comments --}}
 
         <div class="blog-post-comment-container">
-            <h5 id="comment"><i class="fa fa-comments-o mb25"></i> {{ $post->comments->count() }} Comments</h5>
+            <h5 id="comment"><i class="fa fa-comments-o mb25"></i> {{ $post->comments->whereNotNull('approved_by')->count() }} Comments</h5>
 
             {{-- Show top-level comments --}}
-            @include('frontend.partials.comments', ['comments' => $post->comments->whereNull('parent_id')])
+            @include('frontend.partials.comments', ['comments' => $post->comments->whereNotNull('approved_by')->whereNull('parent_id')])
 
             <form action="{{ route('comments.store') }}" method="POST">
                 @csrf
