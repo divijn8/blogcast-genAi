@@ -421,8 +421,7 @@
                                     </label>
                                     <textarea id="ai_modal_excerpt"
                                               class="form-control bg-light border-0"
-                                              rows="3">
-                                    </textarea>
+                                              rows="3"></textarea>
                                 </div>
 
                                 <button id="btn-start-research"
@@ -446,7 +445,13 @@
                         </div>
 
                         <div id="structure-options" class="row"></div>
+                        <div id="ai-sources" class="mt-5" style="display:none;">
+                            <h6 class="font-weight-bold text-uppercase text-muted small mb-3">
+                                Analyzed Sources
+                            </h6>
 
+                            <div id="ai-sources-list" class="d-flex flex-wrap"></div>
+                        </div>
                     </div>
 
                 </div>
@@ -529,6 +534,22 @@
         $('#aiErrorMessage').text(message);
         $('#aiStructureModal').modal('hide');
         $('#aiErrorModal').modal('show');
+    }
+    function renderSources(sources) {
+        if (!sources || !sources.length) return;
+
+        $('#ai-sources').show();
+
+        let html = sources.map(s => `
+            <span class="mr-2 mb-2 d-inline-block px-3 py-2 bg-white border rounded shadow-sm">
+                <i class="fas fa-link text-gray-400 mr-1"></i>
+                <a href="${s.url}" target="_blank" class="text-dark small font-weight-bold">
+                    ${s.domain}
+                </a>
+            </span>
+        `).join('');
+
+        $('#ai-sources-list').html(html);
     }
 </script>
 <script>
@@ -674,7 +695,10 @@
             success: function (res) {
 
                 $('#ai-loading').hide();
-
+                // ✅ Render sources if available
+                if (res.sources) {
+                    renderSources(res.sources);
+                }
                 res.structures.forEach(function (item, index) {
 
                     let badge = (item.badge || '').toLowerCase();

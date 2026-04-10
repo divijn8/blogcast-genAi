@@ -23,6 +23,67 @@
         /* Chat styling for script preview */
         .chat-bubble-host { background-color: #e3f2fd; border-left: 4px solid #4e73df; padding: 10px; margin-bottom: 10px; border-radius: 8px; }
         .chat-bubble-guest { background-color: #f3f4f6; border-left: 4px solid #1cc88a; padding: 10px; margin-bottom: 10px; border-radius: 8px; }
+        .ai-option-card {
+            border-radius: 12px;
+            background: #fff;
+            border: 1px solid #edf2f7;
+            padding: 16px;
+            transition: all 0.25s ease;
+            cursor: pointer;
+            height: 100%;
+        }
+
+        .ai-option-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+        }
+
+        .ai-option-card.selected {
+            border: 2px solid #4e73df;
+            box-shadow: 0 0 0 3px rgba(78,115,223,0.15);
+        }
+
+        .ai-badge {
+            font-size: 0.7rem;
+            font-weight: 700;
+            padding: 4px 10px;
+            border-radius: 20px;
+            background: #e8f0fe;
+            color: #4e73df;
+        }
+
+        .ai-outline {
+            font-size: 0.8rem;
+            color: #444;
+        }
+
+        .ai-outline ul {
+            padding-left: 16px;
+            margin-bottom: 0;
+        }
+
+        .ai-outline li {
+            font-size: 0.8rem;
+            margin-bottom: 4px;
+            color: #444;
+            line-height: 1.4;
+        }
+        .ai-outline {
+            background: #f8f9fc;
+            border: 1px dashed #d1d3e2;
+            padding: 10px;
+            border-radius: 8px;
+        }
+
+                /* === CARD COLOR THEMES === */
+                .card-theme-green   { border-top: 4px solid #1cc88a; }
+                .card-theme-purple  { border-top: 4px solid #6f42c1; }
+                .card-theme-blue    { border-top: 4px solid #4e73df; }
+
+        /* Optional: badge color match */
+        .badge-green   { background: #e6fffa; color: #1cc88a; }
+        .badge-purple  { background: #f3ebff; color: #6f42c1; }
+        .badge-blue    { background: #e8f0fe; color: #4e73df; }
     </style>
 @endsection
 
@@ -291,19 +352,59 @@
                 $('#ai-results-view').show();
                 $('#ai-options-view').show();
 
-                let cardsHtml = '';
-                res.options.forEach(opt => {
-                    cardsHtml += `
-                        <div class="col-md-4">
-                            <div class="card p-3 mb-3 shadow-sm h-100 option-card" style="cursor:pointer; border:2px solid #eee;" onclick="selectOption(this, ${JSON.stringify(opt).replace(/"/g, '&quot;')})">
-                                <span class="badge badge-primary mb-2">${opt.difficulty || 'General'}</span>
-                                <h6 class="font-weight-bold">${opt.title}</h6>
-                                <p class="small text-muted">${opt.tone || 'Conversational'}</p>
-                                <hr>
-                                <p class="small text-dark" style="font-size:0.8rem">${opt.structure_outline || ''}</p>
-                            </div>
-                        </div>`;
+                // ✅ Sort by difficulty
+                const order = {
+                    'Beginner': 1,
+                    'Intermediate': 2,
+                    'Expert': 3
+                };
+
+                res.options.sort((a, b) => {
+                    let aVal = order[a.difficulty] || 99;
+                    let bVal = order[b.difficulty] || 99;
+                    return aVal - bVal;
                 });
+
+                let cardsHtml = '';
+                const themes = ['green', 'purple', 'blue'];
+
+                res.options.forEach((opt, index) => {
+
+                    let theme = themes[index % themes.length]; // rotate colors
+                    let outlinePoints = (opt.structure_outline || '').split('\n');
+
+                    let outlineHtml = '<ul class="mb-0 pl-3">';
+                    outlinePoints.forEach(point => {
+                        if(point.trim()){
+                            outlineHtml += `<li>${point}</li>`;
+                        }
+                    });
+                    outlineHtml += '</ul>';
+
+                    // ✅ Card HTML
+                    cardsHtml += `
+                    <div class="col-md-4 mb-4">
+                        <div class="ai-option-card option-card card-theme-${theme}"
+                            onclick="selectOption(this, ${JSON.stringify(opt).replace(/"/g, '&quot;')})">
+
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <span class="ai-badge badge-${theme}">${opt.difficulty || 'General'}</span>
+                            </div>
+
+                            <h6 class="font-weight-bold mb-2">${opt.title}</h6>
+
+                            <p class="small text-muted mb-2">
+                                ${opt.tone || 'Conversational'}
+                            </p>
+
+                            <div class="ai-outline">
+                                ${outlineHtml}
+                            </div>
+                        </div>
+                    </div>`;
+                });
+
+                // ✅ Render once
                 $('#options-container').html(cardsHtml);
             }).fail(function(xhr) {
                 alert("Server Error: Check console.");
@@ -313,8 +414,8 @@
 
         // --- STEP 2: GENERATE SCRIPT ---
         window.selectOption = function(el, optionData) {
-            $('.option-card').css('border-color', '#eee');
-            $(el).css('border-color', '#4e73df');
+            $('.option-card').removeClass('selected');
+            $(el).addClass('selected');
 
             $('#ai-options-view').hide();
             $('#ai-loading').show().find('h4').text('Writing Script (Host: Female, Expert: Male)...');
