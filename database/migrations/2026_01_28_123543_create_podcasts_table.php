@@ -18,7 +18,7 @@ return new class extends Migration
             $table->text('description');
             $table->json('script_json')->nullable();
             $table->string('audio_path');
-            $table->string('thumbnail');;
+            $table->string('thumbnail');
             $table->integer('duration')->default(0);
             $table->unsignedBigInteger('category_id');
             $table->unsignedBigInteger('author_id');
