@@ -56,7 +56,7 @@
             style="width:100%; border-radius:10px; margin-bottom:25px;">
 
         {{-- CONTENT --}}
-        <div style="font-size:16px; line-height:1.8; color:#333;">
+        <div style="font-size:16px; line-height:1.8; color:#333; text-align: justify;">
             {!! $post->body !!}
         </div>
 
@@ -79,7 +79,7 @@
         </h4>
 
         @include('frontend.partials.comments', [
-            'comments' => $post->comments->whereNotNull('approved_by')->whereNull('parent_id')
+            'comments' => $post->comments->whereNull('parent_id')
         ])
 
         {{-- COMMENT FORM --}}
@@ -93,13 +93,15 @@
                 </div>
             @endguest
 
-            <input type="hidden" name="commentable_type" value="post">
+            <div class="row">
+                <input type="hidden" name="commentable_type" value="post">
             <input type="hidden" name="commentable_id" value="{{ $post->id }}">
 
             <textarea name="comment" class="form-control mb-2" rows="4"
                 placeholder="Write a comment..." required></textarea>
 
             <button class="btn btn-dark">Post Comment</button>
+            </div>
         </form>
 
     </div>
