@@ -11,10 +11,11 @@
 
                 <div class="card-body">
 
-                    <div class="row align-items-center">
+                    <div class="row {{ $subscriptionStatus != 'active' ? 'justify-content-center align-items-center' : 'align-items-center' }}"
+                        style="{{ $subscriptionStatus != 'active' ? 'min-height:250px;' : '' }}">
 
                         {{-- 🔥 LEFT: SUBSCRIPTION DETAILS --}}
-                        <div class="col-md-7">
+                        <div class="{{ $subscriptionStatus == 'active' ? 'col-md-7' : 'col-md-12' }}">
 
                             {{-- HEADER --}}
                             <div class="d-flex justify-content-between align-items-center mb-3">
@@ -68,17 +69,26 @@
 
                             @else
 
-                                <div class="mt-3">
-                                    <p class="text-muted mb-2">Upgrade to start generating AI content</p>
-                                    <a href="{{ route('subscriptions.index') }}" class="btn btn-primary btn-sm px-4">
-                                        Upgrade Plan
-                                    </a>
+                                <div class="d-flex justify-content-center align-items-center h-100">
+                                    <div class="p-3 text-center" style="background:#f8f9fc; border-radius:10px; max-width:320px; width:100%;">
+                                        <i class="fas fa-lock fa-2x text-danger mb-2"></i>
+
+                                        <h6 class="mb-1">No Active Subscription</h6>
+
+                                        <p class="text-muted small mb-2">
+                                            Unlock AI content generation by upgrading your plan
+                                        </p>
+
+                                        <a href="{{ route('subscriptions.index') }}"
+                                        class="btn btn-danger btn-sm px-4">
+                                            Upgrade Now
+                                        </a>
+                                    </div>
                                 </div>
 
                             @endif
 
                         </div>
-
                         {{-- 🔥 RIGHT: PIE CHART --}}
                         <div class="col-md-5 text-center">
 
@@ -88,13 +98,6 @@
 
                                 <div style="max-width: 200px; margin:auto;">
                                     <canvas id="aiUsageChart"></canvas>
-                                </div>
-
-                            @else
-
-                                <div class="text-muted">
-                                    <i class="fas fa-chart-pie fa-2x mb-2"></i>
-                                    <p>No usage data</p>
                                 </div>
 
                             @endif
@@ -114,7 +117,7 @@
         {{-- ================= BLOGS ================= --}}
         <div class="col-md-6">
 
-            <div class="card shadow mb-4">
+            <div class="card shadow mb-4 h-100">
                 <div class="card-header bg-primary text-white">
                     Blogs Section
                 </div>
@@ -171,7 +174,7 @@
         {{-- ================= PODCASTS ================= --}}
         <div class="col-md-6">
 
-            <div class="card shadow mb-4">
+            <div class="card shadow mb-4 h-100">
                 <div class="card-header bg-info text-white">
                     Podcasts Section
                 </div>
@@ -231,7 +234,7 @@
 
         {{-- MOST USED TAGS --}}
         <div class="col-md-6">
-            <div class="card shadow mb-4">
+            <div class="card shadow mb-4 h-100">
                 <div class="card-header bg-dark text-white">
                     Most Used Tags
                 </div>
@@ -253,7 +256,7 @@
 
         {{-- MOST USED CATEGORIES --}}
         <div class="col-md-6">
-            <div class="card shadow mb-4">
+            <div class="card shadow mb-4 h-100">
                 <div class="card-header bg-secondary text-white">
                     Most Used Categories
                 </div>
