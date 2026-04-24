@@ -277,13 +277,32 @@
 
     <script>
         function openReportModal(type, id) {
-            document.getElementById('reportModal').style.display = 'block';
+            resetReportModal();
+            const modal = document.getElementById('reportModal');
+            modal.style.display = 'flex';
+
             document.getElementById('report_type').value = type;
             document.getElementById('report_id').value = id;
         }
 
         function closeReportModal() {
-            document.getElementById('reportModal').style.display = 'none';
+            const modal = document.getElementById('reportModal');
+            modal.style.display = 'none';
+
+            resetReportModal(); // 🔥 important
+        }
+
+        document.getElementById('reportModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeReportModal();
+            }
+        });
+
+        function resetReportModal() {
+            document.getElementById('report_reason').value = 'spam';
+            document.getElementById('report_description').value = '';
+            document.getElementById('report_type').value = '';
+            document.getElementById('report_id').value = '';
         }
 
         function submitReport() {
@@ -308,7 +327,8 @@
             .then(res => res.json())
             .then(data => {
                 showReportToast("Thanks! We'll review this content.");
-                closeReportModal();
+                resetReportModal();   // clear inputs
+                closeReportModal();   // close modal
             })
             .catch(err => {
                 alert("Error submitting report");

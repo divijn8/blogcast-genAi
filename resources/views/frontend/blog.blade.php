@@ -7,95 +7,103 @@
 
 
 @section('main-content')
-    <div class="blog-three-mini">
-        <h2 class="color-dark">
-            <a href="#">{{ $post->title }}</a>
-        </h2>
-        <div class="blog-three-attrib">
-            <div><i class="fa fa-calendar"></i>{{$post->created_at->format('F j, Y')}}</div> |
-            <div><i class="fa fa-pencil"></i>{{ $post->author->name }}</div> |
-            <div><i class="fa fa-eye"></i>{{ $post->view_count }}</div> |
-            <div><a href="#comment"><i class="fa fa-comment-o"></i>{{ $post->comments->count() }}</a></div> |
-            <div>
-                <div>
-                    Share:
-                    <a href="https://www.facebook.com/sharer/sharer.php?u={{ $postUrl }}"
-                    target="_blank">
-                        <i class="fa fa-facebook-official"></i>
-                    </a>
+    <div class="container" style="max-width: 850px; margin: auto;">
 
-                    <a href="https://twitter.com/intent/tweet?url={{ $postUrl }}&text={{ $postTitle }}"
-                    target="_blank">
+        {{-- TITLE --}}
+        <h1 style="font-weight:700; font-size:34px; margin-bottom:10px;">
+            {{ $post->title }}
+        </h1>
+
+        {{-- META BAR --}}
+        <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:20px; flex-wrap:wrap; gap:10px;">
+
+            <div style="display:flex; align-items:center; gap:10px;">
+                <img src="{{ $post->author->user_profile }}"
+                    style="width:40px; height:40px; border-radius:50%;">
+
+                <div>
+                    <div style="font-weight:600;">{{ $post->author->name }}</div>
+                    <div style="font-size:12px; color:#777;">
+                        {{ $post->created_at->format('F j, Y') }} • {{ $post->view_count }} views
+                    </div>
+                </div>
+            </div>
+
+            {{-- ACTIONS --}}
+            <div style="display:flex; align-items:center; gap:15px;">
+
+                {{-- SHARE --}}
+                <div style="display:flex; gap:10px;">
+                    <a href="https://twitter.com/intent/tweet?url={{ $postUrl }}&text={{ $postTitle }}" target="_blank">
                         <i class="fa fa-twitter"></i>
                     </a>
-
-                    <a href="https://www.linkedin.com/sharing/share-offsite/?url={{ $postUrl }}"
-                    target="_blank">
+                    <a href="https://www.linkedin.com/sharing/share-offsite/?url={{ $postUrl }}" target="_blank">
                         <i class="fa fa-linkedin"></i>
-                    </a>
-
-                    <a href="https://pinterest.com/pin/create/button/?url={{ $postUrl }}&description={{ $postTitle }}"
-                    target="_blank">
-                        <i class="fa fa-pinterest"></i>
                     </a>
                 </div>
 
-            </div>
+                {{-- REPORT (MODERN BUTTON) --}}
+                <button onclick="openReportModal('post', {{ $post->id }})"
+                    style="border:none; background:#f5f5f5; padding:6px 12px; border-radius:6px; font-size:13px;">
+                    🚩 Report
+                </button>
 
-            <div>
-                <a href="javascript:void(0)" onclick="openReportModal('post', {{ $post->id }})">
-                    <i class="fa fa-flag"></i> Report
-                </a>
             </div>
         </div>
 
-        <img src="{{ asset($post->thumbnail_path) }}" alt="Blog Image" class="img-responsive">
-        {!! $post->body !!}
-        <div class="blog-post-read-tag mt50">
-            <i class="fa fa-tags"></i> Tags:
+        {{-- IMAGE --}}
+        <img src="{{ asset($post->thumbnail_path) }}"
+            style="width:100%; border-radius:10px; margin-bottom:25px;">
+
+        {{-- CONTENT --}}
+        <div style="font-size:16px; line-height:1.8; color:#333;">
+            {!! $post->body !!}
+        </div>
+
+        {{-- TAGS --}}
+        <div style="margin-top:30px;">
             @foreach($post->tags as $tag)
-                <a href="{{ route('frontend.showByTag', $tag->name) }}"> {{$tag->name}}</a>,
+                <a href="{{ route('frontend.showByTag', $tag->name) }}"
+                style="background:#eee; padding:6px 10px; border-radius:20px; font-size:12px; margin-right:5px;">
+                    #{{ $tag->name }}
+                </a>
             @endforeach
         </div>
 
+        {{-- DIVIDER --}}
+        <hr style="margin:40px 0;">
+
+        {{-- COMMENTS --}}
+        <h4 style="margin-bottom:20px;">
+            💬 {{ $post->comments->whereNotNull('approved_by')->count() }} Comments
+        </h4>
+
+        @include('frontend.partials.comments', [
+            'comments' => $post->comments->whereNotNull('approved_by')->whereNull('parent_id')
+        ])
+
+        {{-- COMMENT FORM --}}
+        <form action="{{ route('comments.store') }}" method="POST" style="margin-top:20px;">
+            @csrf
+
+            @guest
+                <div class="row">
+                    <input type="text" name="guest_name" class="form-control mb-2" placeholder="Name">
+                    <input type="email" name="guest_email" class="form-control mb-2" placeholder="Email">
+                </div>
+            @endguest
+
+            <input type="hidden" name="commentable_type" value="post">
+            <input type="hidden" name="commentable_id" value="{{ $post->id }}">
+
+            <textarea name="comment" class="form-control mb-2" rows="4"
+                placeholder="Write a comment..." required></textarea>
+
+            <button class="btn btn-dark">Post Comment</button>
+        </form>
+
     </div>
-    <div class="mb50">
-        <img src="{{ $post->author->user_profile }}" class="img-circle" alt="image">
-        <span class="blog-post-author-name">{{ $post->author->name }}</span> <a href="https://twitter.com/booisme"><i class="fa fa-twitter"></i></a>
-    </div>
 
-        {{--  Comments --}}
-
-        <div class="blog-post-comment-container">
-            <h5 id="comment"><i class="fa fa-comments-o mb25"></i> {{ $post->comments->whereNotNull('approved_by')->count() }} Comments</h5>
-
-            {{-- Show top-level comments --}}
-            @include('frontend.partials.comments', ['comments' => $post->comments->whereNotNull('approved_by')->whereNull('parent_id')])
-
-            <form action="{{ route('comments.store') }}" method="POST">
-                @csrf
-
-                @guest
-                    <div class="row" style="margin-left: 3px">
-                        <input type="text" name="guest_name" class="col-md-6 blog-leave-comment-input" placeholder="name">
-                        <input type="email" name="guest_email" class="col-md-6 blog-leave-comment-input" placeholder="email">
-                    </div>
-                @endguest
-
-                <input type="hidden" name="commentable_type" value="post">
-                <input type="hidden" name="commentable_id" value="{{ $post->id }}">
-
-                <textarea name="comment"
-                        class="form-control mb-2 blog-leave-comment-textarea"
-                        rows="5"
-                        placeholder="Write a comment..."
-                        required></textarea>
-
-                <button type="submit" class="button button-pasific button-sm center-block mb25">
-                    Leave Comment
-                </button>
-            </form>
-        </div>
 
 
         <script>
@@ -132,13 +140,32 @@
 
         <script>
             function openReportModal(type, id) {
-                document.getElementById('reportModal').style.display = 'block';
+                resetReportModal();
+                const modal = document.getElementById('reportModal');
+                modal.style.display = 'flex';
+
                 document.getElementById('report_type').value = type;
                 document.getElementById('report_id').value = id;
             }
 
             function closeReportModal() {
-                document.getElementById('reportModal').style.display = 'none';
+                const modal = document.getElementById('reportModal');
+                modal.style.display = 'none';
+
+                resetReportModal(); // 🔥 important
+            }
+
+            document.getElementById('reportModal').addEventListener('click', function(e) {
+                if (e.target === this) {
+                    closeReportModal();
+                }
+            });
+
+            function resetReportModal() {
+                document.getElementById('report_reason').value = 'spam';
+                document.getElementById('report_description').value = '';
+                document.getElementById('report_type').value = '';
+                document.getElementById('report_id').value = '';
             }
 
             function submitReport() {
@@ -163,8 +190,9 @@
                 .then(res => res.json())
                 .then(data => {
                     showReportToast("Thanks! We'll review this content.");
-                    closeReportModal();
-                })
+                        resetReportModal();   // clear inputs
+                        closeReportModal();   // close modal
+                    })
                 .catch(err => {
                     alert("Error submitting report");
                     console.error(err);

@@ -97,34 +97,79 @@
 <script src="{{ asset('frontend/assets/js/main/imagesloaded.pkgd.min.js') }}"></script>
 <script src="{{ asset('frontend/assets/js/main/main.js') }}"></script>
 
-<div id="reportModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); z-index:9999;">
-    <div style="background:white; width:420px; margin:120px auto; padding:20px; border-radius:10px;">
+<!-- MODERN REPORT MODAL -->
+<div id="reportModal" style="
+    display:none;
+    position:fixed;
+    inset:0;
+    background:rgba(0,0,0,0.5);
+    backdrop-filter: blur(4px);
+    z-index:9999;
+    align-items:center;
+    justify-content:center;
+">
 
-        <h4><i class="fa fa-flag"></i> Report Content</h4>
+    <div style="
+        background:white;
+        width:420px;
+        border-radius:12px;
+        padding:20px;
+        box-shadow:0 10px 30px rgba(0,0,0,0.2);
+        animation:fadeIn 0.25s ease;
+    ">
+
+        <!-- HEADER -->
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
+            <h4 style="margin:0; font-weight:600;">Report Content</h4>
+            <button onclick="closeReportModal()" style="
+                border:none;
+                background:none;
+                font-size:20px;
+                cursor:pointer;
+            ">×</button>
+        </div>
+
+        <!-- OPTIONS -->
+        <div style="margin-bottom:15px;">
+            <label style="font-size:13px; color:#666;">Reason</label>
+
+            <select id="report_reason" class="form-control" style="
+                border-radius:8px;
+                margin-top:5px;
+                padding:8px;
+            ">
+                <option value="spam">Spam</option>
+                <option value="abuse">Abusive Content</option>
+                <option value="violence">Violence</option>
+                <option value="misinformation">Misinformation</option>
+                <option value="other">Other</option>
+            </select>
+        </div>
+
+        <!-- DESCRIPTION -->
+        <div style="margin-bottom:20px;">
+            <label style="font-size:13px; color:#666;">Additional details (optional)</label>
+
+            <textarea id="report_description"
+                class="form-control"
+                rows="3"
+                placeholder="Tell us more..."
+                style="border-radius:8px; margin-top:5px;"></textarea>
+        </div>
+
+        <!-- ACTIONS -->
+        <div style="display:flex; justify-content:flex-end; gap:10px;">
+            <button onclick="closeReportModal()" class="btn btn-light">
+                Cancel
+            </button>
+
+            <button onclick="submitReport()" class="btn btn-danger">
+                Submit Report
+            </button>
+        </div>
 
         <input type="hidden" id="report_type">
         <input type="hidden" id="report_id">
-
-        <label>Reason:</label>
-        <select id="report_reason" class="form-control">
-            <option value="spam">Spam or misleading</option>
-            <option value="abuse">Hate speech or abuse</option>
-            <option value="violence">Violence</option>
-            <option value="harassment">Harassment</option>
-            <option value="misinformation">Misinformation</option>
-            <option value="other">Other</option>
-        </select>
-
-        <br>
-
-        <label>Description (optional):</label>
-        <textarea id="report_description" class="form-control"></textarea>
-
-        <br>
-
-        <button class="btn btn-danger btn-sm" onclick="submitReport()">Submit</button>
-        <button class="btn btn-default btn-sm" onclick="closeReportModal()">Cancel</button>
-
     </div>
 </div>
 
@@ -143,6 +188,11 @@
 ">
     ✔ <span id="report-toast-msg"></span>
 </div>
-
+<style>
+@keyframes fadeIn {
+    from { transform: scale(0.95); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
+}
+</style>
 </body>
 </html>
