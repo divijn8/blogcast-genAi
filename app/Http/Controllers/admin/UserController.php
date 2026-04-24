@@ -166,6 +166,35 @@ class UserController extends Controller
                 ->first(),
         ];
 
+        // 1. Engagement Metrics
+        $avgBlogViews = $postCount > 0 ? ceil($totalViewCount / $postCount) : 0;
+        $avgPodcastViews = $podcastCount > 0 ? ceil($podcastViews / $podcastCount) : 0;
+
+        // 2. Storage Estimation (Assuming 1 Podcast = ~5MB on average)
+        $estimatedStorageMB = $podcastCount * 5;
+        $storageLimitMB = 100;
+        $storagePercentage = min(($estimatedStorageMB / $storageLimitMB) * 100, 100);
+
+        // 3. Content Growth Trend (Last 6 Months)
+        $months = [];
+        $blogGrowthData = [];
+        $podcastGrowthData = [];
+
+        for ($i = 5; $i >= 0; $i--) {
+            $date = now()->subMonths($i);
+            $months[] = $date->format('M'); // e.g., 'Nov', 'Dec', 'Jan'
+
+            $blogGrowthData[] = Post::where('author_id', $userId)
+                ->whereYear('created_at', $date->year)
+                ->whereMonth('created_at', $date->month)
+                ->count();
+
+            $podcastGrowthData[] = Podcast::where('author_id', $userId)
+                ->whereYear('created_at', $date->year)
+                ->whereMonth('created_at', $date->month)
+                ->count();
+        }
+
         return view('admin.dashboard', compact(
             // OLD
             'postCount',
@@ -186,7 +215,10 @@ class UserController extends Controller
             'podcastViews',
             'topPodcasts',
             'recentPodcasts',
-            'podcastReports'
+            'podcastReports',
+            'avgBlogViews', 'avgPodcastViews',
+            'estimatedStorageMB', 'storageLimitMB', 'storagePercentage',
+            'months', 'blogGrowthData', 'podcastGrowthData'
         ));
     }
 }
