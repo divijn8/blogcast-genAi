@@ -89,6 +89,20 @@
 
 @yield('page-level-scripts')
 
+<style>
+    .sidebar {
+        position: fixed;
+        top: 0;
+        left: 0;
+        height: 100vh;
+        width: 250px;
+        overflow-y: auto;
+    }
+
+    #content-wrapper {
+        margin-left: 250px;
+    }
+</style>
 </body>
 
 </html>

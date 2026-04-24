@@ -1,208 +1,307 @@
 @extends('admin.layouts.app')
 
 @section('main-content')
-    <!-- Page Heading -->
-    <div class="d-sm-flex align-items-center justify-content-between mb-4">
-        <h1 class="h3 mb-0 text-gray-800">Dashboard</h1>
+
+<div class="container-fluid">
+
+    {{-- 🔥 TOP: SUBSCRIPTION --}}
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card shadow border-0" style="border-radius:14px;">
+
+                <div class="card-body">
+
+                    <div class="row align-items-center">
+
+                        {{-- 🔥 LEFT: SUBSCRIPTION DETAILS --}}
+                        <div class="col-md-7">
+
+                            {{-- HEADER --}}
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <h5 class="mb-0 font-weight-bold">Subscription</h5>
+
+                                <span class="badge {{ $subscriptionStatus == 'active' ? 'badge-success' : 'badge-danger' }}">
+                                    {{ strtoupper($subscriptionStatus) }}
+                                </span>
+                            </div>
+
+                            {{-- PLAN --}}
+                            <div class="mb-3">
+                                <h4 class="mb-1">
+                                    {{ $subscriptionStatus == 'active' ? ($subscriptionPlan->name ?? 'Plan') : 'No Active Plan' }}
+                                </h4>
+
+                                @if($subscriptionStatus == 'active')
+                                    <small class="text-muted">AI Content Generation Plan</small>
+                                @endif
+                            </div>
+
+                            {{-- PROGRESS --}}
+                            @if($subscriptionStatus == 'active')
+
+                                @php
+                                    $total = $totalArticles->articles_per_month ?? 3;
+                                    $used = $total - $articlesRemaining;
+                                    $percentage = ($total > 0) ? ($used / $total) * 100 : 0;
+                                @endphp
+
+                                <div class="mb-3">
+
+                                    <div class="d-flex justify-content-between small mb-1">
+                                        <span>Usage</span>
+                                        <span>{{ $used }} / {{ $total }}</span>
+                                    </div>
+
+                                    <div class="progress" style="height:8px; border-radius:10px;">
+                                        <div class="progress-bar
+                                            {{ $percentage > 80 ? 'bg-danger' : ($percentage > 50 ? 'bg-warning' : 'bg-success') }}"
+                                            role="progressbar"
+                                            style="width: {{ $percentage }}%">
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="d-flex justify-content-between small text-muted">
+                                    <span>Remaining: {{ $articlesRemaining }}</span>
+                                    <span>{{ round($percentage) }}% used</span>
+                                </div>
+
+                            @else
+
+                                <div class="mt-3">
+                                    <p class="text-muted mb-2">Upgrade to start generating AI content</p>
+                                    <a href="{{ route('subscriptions.index') }}" class="btn btn-primary btn-sm px-4">
+                                        Upgrade Plan
+                                    </a>
+                                </div>
+
+                            @endif
+
+                        </div>
+
+                        {{-- 🔥 RIGHT: PIE CHART --}}
+                        <div class="col-md-5 text-center">
+
+                            @if($subscriptionStatus == 'active')
+
+                                <h6 class="mb-3">AI Usage</h6>
+
+                                <div style="max-width: 200px; margin:auto;">
+                                    <canvas id="aiUsageChart"></canvas>
+                                </div>
+
+                            @else
+
+                                <div class="text-muted">
+                                    <i class="fas fa-chart-pie fa-2x mb-2"></i>
+                                    <p>No usage data</p>
+                                </div>
+
+                            @endif
+
+                        </div>
+
+                    </div>
+
+                </div>
+            </div>
+        </div>
     </div>
 
-    <!-- Content Row -->
+    {{-- 🔥 MAIN SPLIT --}}
     <div class="row">
-        <!-- Earnings (Monthly) Card Example -->
-        <div class="col-xl-3 col-md-6 mb-4">
-            <div class="card border-left-primary shadow h-100 py-2">
-                <div class="card-body">
-                    <div class="row no-gutters align-items-center">
-                        <div class="col mr-2">
-                            <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
-                                Total Blogs</div>
-                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ $postCount }}</div>
-                        </div>
-                        <div class="col-auto">
-                            <i class="fas fa-blog fa-2x text-gray-300"></i>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
 
-        <!-- Earnings (Monthly) Card Example -->
-        <div class="col-xl-3 col-md-6 mb-4">
-            <div class="card border-left-success shadow h-100 py-2">
-                <div class="card-body">
-                    <div class="row no-gutters align-items-center">
-                        <div class="col mr-2">
-                            <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
-                                Total Views</div>
-                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{$totalViewCount}}</div>
-                        </div>
-                        <div class="col-auto">
-                            <i class="fas fa-eye fa-2x text-gray-300"></i>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
+        {{-- ================= BLOGS ================= --}}
+        <div class="col-md-6">
 
-        <!-- Earnings (Monthly) Card Example -->
-        <div class="col-xl-3 col-md-6 mb-4">
-            <div class="card border-left-info shadow h-100 py-2">
-                <div class="card-body">
-                    <div class="row no-gutters align-items-center">
-                        <div class="col mr-2">
-                            <div class="text-xs font-weight-bold text-info text-uppercase mb-1">Plan</div>
-                            <div class="row no-gutters align-items-center">
-                                <div class="col-auto">
-                                    @if ($subscriptionStatus == 'active')
-                                        <div class="h5 mb-0 mr-3 font-weight-bold text-gray-800">{{$subscriptionPlan->name}}</div>
-                                    @else
-                                        <div class="h5 mb-0 mr-3 font-weight-bold text-gray-800">No Subscriptions</div>
-                                    @endif
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-auto">
-                            <i class="fas fa-clipboard-list fa-2x text-gray-300"></i>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Pending Requests Card Example -->
-        <div class="col-xl-3 col-md-6 mb-4">
-            @if ($subscriptionStatus == 'active')
-                <div class="card border-left-success shadow h-100 py-2">
-                    <div class="card-body">
-                        <div class="row no-gutters align-items-center">
-                            <div class="col mr-2">
-                                <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
-                                    ACTIVE
-                                </div>
-                            </div>
-                            <div class="col-auto">
-                                <i class="fas fa-user fa-2x text-gray-300"></i>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            @else
-                <div class="card border-left-danger shadow h-100 py-2">
-                    <div class="card-body">
-                        <div class="row no-gutters align-items-center">
-                            <div class="col mr-2">
-                                <div class="text-xs font-weight-bold text-danger text-uppercase mb-1">
-                                    INACTIVE
-                                </div>
-                            </div>
-                            <div class="col-auto">
-                                <i class="fas fa-user fa-2x text-gray-300"></i>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            @endif
-        </div>
-    </div>
-
-    <!-- Content Row (Tags, Categories, Pie Chart) -->
-    <div class="row">
-        <div class="col-xl-4 col-lg-4 col-md-6 mb-4">
-            <!-- Most Used Tags Card Example -->
             <div class="card shadow mb-4">
-                <div class="card-header py-3">
-                    <h6 class="m-0 font-weight-bold text-primary">Most Used Tags</h6>
+                <div class="card-header bg-primary text-white">
+                    Blogs Section
                 </div>
+
                 <div class="card-body">
-                    @foreach($mostUsedTags as $tag)
-                        <h4 class="small font-weight-bold">{{ $tag->name }}<span class="float-right">{{ $tag->count }}</span></h4>
+
+                    <div class="d-flex justify-content-between mb-2">
+                        <span>Total Blogs</span>
+                        <strong>{{ $postCount }}</strong>
+                    </div>
+
+                    <div class="d-flex justify-content-between mb-3">
+                        <span>Total Views</span>
+                        <strong>{{ $totalViewCount }}</strong>
+                    </div>
+
+                    <hr>
+
+                    {{-- TOP BLOGS --}}
+                    <h6>Top Blogs</h6>
+                    @foreach($topBlogs as $blog)
+                        <div class="d-flex justify-content-between small mb-1">
+                            <span>{{ \Illuminate\Support\Str::limit($blog->title, 30) }}</span>
+                            <span>{{ $blog->view_count }}</span>
+                        </div>
                     @endforeach
-                </div>
-            </div>
-        </div>
 
-        <div class="col-xl-4 col-lg-4 col-md-6 mb-4">
-            <!-- Most Used Categories Card Example -->
-            <div class="card shadow mb-4">
-                <div class="card-header py-3">
-                    <h6 class="m-0 font-weight-bold text-primary">Most Used Categories</h6>
-                </div>
-                <div class="card-body">
-                    @foreach($mostUsedCategories as $category)
-                        <h4 class="small font-weight-bold">{{ $category->name }}<span class="float-right">{{ $category->count }}</span></h4>
+                    <hr>
+
+                    {{-- RECENT BLOGS --}}
+                    <h6>Recent Blogs</h6>
+                    @foreach($recentBlogs as $blog)
+                        <div class="small">
+                            {{ \Illuminate\Support\Str::limit($blog->title, 30) }}
+                            <small class="text-muted">
+                                • {{ $blog->created_at->diffForHumans() }}
+                            </small>
+                        </div>
                     @endforeach
+
+                    <hr>
+
+                    {{-- REPORTS --}}
+                    <div class="d-flex justify-content-between">
+                        <span>Reports</span>
+                        <strong class="text-danger">{{ $blogReports }}</strong>
+                    </div>
+
                 </div>
             </div>
+
         </div>
 
-        @if($subscriptionStatus == 'active')
-        <div class="col-xl-4 col-lg-4 col-md-6 mb-4">
-            <!-- Pie Chart -->
+        {{-- ================= PODCASTS ================= --}}
+        <div class="col-md-6">
+
             <div class="card shadow mb-4">
-                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-                    <h6 class="m-0 font-weight-bold text-primary">Article Generated</h6>
+                <div class="card-header bg-info text-white">
+                    Podcasts Section
                 </div>
+
                 <div class="card-body">
-                    <div class="chart-pie pt-4 pb-2">
-                        <canvas id="myPieChart"></canvas>
+
+                    <div class="d-flex justify-content-between mb-2">
+                        <span>Total Podcasts</span>
+                        <strong>{{ $podcastCount }}</strong>
                     </div>
-                    <div class="mt-4 text-center small">
-                        <span class="mr-2">
-                            <i class="fas fa-circle text-primary"></i> Used
-                        </span>
-                        <span class="mr-2">
-                            <i class="fas fa-circle text-success"></i> Remaining
-                        </span>
+
+                    <div class="d-flex justify-content-between mb-3">
+                        <span>Total Views</span>
+                        <strong>{{ $podcastViews }}</strong>
                     </div>
+
+                    <hr>
+
+                    {{-- TOP PODCASTS --}}
+                    <h6>Top Podcasts</h6>
+                    @foreach($topPodcasts as $podcast)
+                        <div class="d-flex justify-content-between small mb-1">
+                            <span>{{ \Illuminate\Support\Str::limit($podcast->title, 30) }}</span>
+                            <span>{{ $podcast->view_count }}</span>
+                        </div>
+                    @endforeach
+
+                    <hr>
+
+                    {{-- RECENT PODCASTS --}}
+                    <h6>Recent Podcasts</h6>
+                    @foreach($recentPodcasts as $podcast)
+                        <div class="small">
+                            {{ \Illuminate\Support\Str::limit($podcast->title, 30) }}
+                            <small class="text-muted">
+                                • {{ $podcast->created_at->diffForHumans() }}
+                            </small>
+                        </div>
+                    @endforeach
+
+                    <hr>
+
+                    {{-- REPORTS --}}
+                    <div class="d-flex justify-content-between">
+                        <span>Reports</span>
+                        <strong class="text-danger">{{ $podcastReports }}</strong>
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+    {{-- 🔥 TAGS + CATEGORIES (BOTTOM SECTION) --}}
+    <div class="row mt-3">
+
+        {{-- MOST USED TAGS --}}
+        <div class="col-md-6">
+            <div class="card shadow mb-4">
+                <div class="card-header bg-dark text-white">
+                    Most Used Tags
+                </div>
+
+                <div class="card-body">
+
+                    @forelse($mostUsedTags as $tag)
+                        <div class="d-flex justify-content-between mb-2">
+                            <span>#{{ $tag->name }}</span>
+                            <strong>{{ $tag->count }}</strong>
+                        </div>
+                    @empty
+                        <p class="text-muted">No tags yet</p>
+                    @endforelse
+
                 </div>
             </div>
         </div>
-    </div>
-    @else($subscriptionStatus == 'inactive')
-    <div class="col-xl-4 col-lg-4 col-md-6 mb-4">
-        <!-- Card for Inactive Subscription -->
-        <div class="card shadow mb-4">
-            <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-                <h6 class="m-0 font-weight-bold text-danger">Inactive Subscription</h6>
-            </div>
-            <div class="card-body">
-                <!-- Message to show when the subscription is inactive -->
-                <p>Your subscription is inactive, and you have reached your article generation limit.</p>
 
-                <!-- Display Article Usage Information -->
+        {{-- MOST USED CATEGORIES --}}
+        <div class="col-md-6">
+            <div class="card shadow mb-4">
+                <div class="card-header bg-secondary text-white">
+                    Most Used Categories
+                </div>
 
+                <div class="card-body">
 
-                <!-- Warning Message -->
-                @if($articlesRemaining < 0)
-                    <div class="alert alert-warning mt-3">
-                        <strong>Warning:</strong> You have <strong>{{ $articlesRemaining }}</strong> article generation(s) left. Kindly activate your subscription to get more article generations.
-                    </div>
-                @else
-                    <div class="alert alert-danger mt-3">
-                        <strong>Warning:</strong> You have reached your article generation limit. Kindly activate your subscription to get more article generations.
-                    </div>
-                @endif
+                    @forelse($mostUsedCategories as $category)
+                        <div class="d-flex justify-content-between mb-2">
+                            <span>{{ $category->name }}</span>
+                            <strong>{{ $category->count }}</strong>
+                        </div>
+                    @empty
+                        <p class="text-muted">No categories yet</p>
+                    @endforelse
 
-                <!-- Option to Renew Subscription -->
-                <a href="{{ route('subscriptions.index') }}" class="btn btn-primary mt-3">Activate Subscription</a>
+                </div>
             </div>
         </div>
+
     </div>
-    @endif
+</div>
 
-@endsection
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-@section('page-level-scripts')
-    <!-- Page level plugins -->
-    <script src="{{ asset('admin/vendor/chart.js/Chart.min.js') }}"></script>
+<script>
+    const used = {{ ($totalArticles->articles_per_month ?? 3) - $articlesRemaining }};
+    const remaining = {{ $articlesRemaining }};
 
-    <!-- Page level custom scripts -->
-    <script>
-        var articlesRemaining = {{ $articlesRemaining }};
-        var totalArticles = {{ isset($totalArticles->articles_per_month) ? $totalArticles->articles_per_month : 3 }};
-        var articlesUsed = totalArticles - articlesRemaining;
-        console.log($articlesRemaining)
-    </script>
-    <script src="{{ asset('admin/js/demo/chart-area-demo.js') }}"></script>
-    <script src="{{ asset('admin/js/demo/chart-pie-demo.js') }}"></script>
+    const ctx = document.getElementById('aiUsageChart');
+
+    new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+            labels: ['Used', 'Remaining'],
+            datasets: [{
+                data: [used, remaining],
+                backgroundColor: ['#4e73df', '#1cc88a'],
+                borderWidth: 0
+            }]
+        },
+        options: {
+            cutout: '70%',
+            plugins: {
+                legend: {
+                    position: 'bottom'
+                }
+            }
+        }
+    });
+</script>
 @endsection
