@@ -12,8 +12,11 @@ class PodcastController extends Controller
 {
     public function index()
     {
-        $podcasts = Podcast::with(['category', 'tags'])->latest()->paginate(10);
-        $totalListens = Podcast::sum('view_count');
+        $podcasts = Podcast::with(['category', 'tags'])
+                    ->published() // ✅ applies status + disabled filter
+                    ->latest()
+                    ->paginate(10);
+        $totalListens = Podcast::published()->sum('view_count');
         $categories = Category::where('type', 'podcast')->withCount('podcasts')->get();
 
         if (request()->is('admin/*')) {
@@ -112,9 +115,13 @@ class PodcastController extends Controller
 
     public function show($slug)
     {
-        $podcast = Podcast::where('slug', $slug)
-                          ->orWhere('id', $slug)
-                          ->firstOrFail();
+        $podcast = Podcast::where(function ($query) use ($slug) {
+            $query->where('slug', $slug)
+                ->orWhere('id', $slug);
+        })
+        ->where('status', Podcast::STATUS_ACTIVE)
+        ->where('is_disabled', false)
+        ->firstOrFail();
 
         $podcast->increment('view_count');
 

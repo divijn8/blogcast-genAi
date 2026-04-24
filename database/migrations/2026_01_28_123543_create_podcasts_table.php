@@ -18,7 +18,10 @@ return new class extends Migration
             $table->text('description');
             $table->json('script_json')->nullable();
             $table->string('audio_path');
-            $table->string('thumbnail');;
+            $table->string('thumbnail');
+            $table->boolean('is_disabled')->default(false);
+            $table->integer('report_count')->default(0);
+            $table->enum('status', ['active', 'under_review', 'disabled'])->default('active');
             $table->integer('duration')->default(0);
             $table->unsignedBigInteger('category_id');
             $table->unsignedBigInteger('author_id');

@@ -125,6 +125,11 @@
             <span class="label label-primary" style="font-size: 12px; padding: 5px 10px; border-radius: 15px;">
                 {{ $podcast->category->name ?? 'Podcast' }}
             </span>
+            <span style="margin-left: 10px;">
+                <a href="javascript:void(0)" onclick="openReportModal('podcast', {{ $podcast->id }})">
+                    <i class="fa fa-flag"></i> Report
+                </a>
+            </span>
             <h2 style="color: white; font-weight: 800; margin-top: 15px;">{{ $podcast->title }}</h2>
 
             <div style="opacity: 0.8; font-size: 13px; margin-top: 10px;">
@@ -269,6 +274,70 @@
         });
 
     </script>
+
+    <script>
+        function openReportModal(type, id) {
+            document.getElementById('reportModal').style.display = 'block';
+            document.getElementById('report_type').value = type;
+            document.getElementById('report_id').value = id;
+        }
+
+        function closeReportModal() {
+            document.getElementById('reportModal').style.display = 'none';
+        }
+
+        function submitReport() {
+            let type = document.getElementById('report_type').value;
+            let id = document.getElementById('report_id').value;
+            let reason = document.getElementById('report_reason').value;
+            let description = document.getElementById('report_description').value;
+
+            fetch('/report', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                },
+                body: JSON.stringify({
+                    type: type,
+                    id: id,
+                    reason: reason,
+                    description: description
+                })
+            })
+            .then(res => res.json())
+            .then(data => {
+                showReportToast("Thanks! We'll review this content.");
+                closeReportModal();
+            })
+            .catch(err => {
+                alert("Error submitting report");
+                console.error(err);
+            });
+        }
+        </script>
+
+        <script>
+            function showReportToast(message) {
+                const toast = document.getElementById('report-toast');
+                const msg = document.getElementById('report-toast-msg');
+
+                msg.innerText = message;
+                toast.style.display = 'block';
+                toast.style.opacity = '1';
+                toast.style.transform = 'translateX(0)';
+
+                // auto hide
+                setTimeout(() => {
+                    toast.style.opacity = '0';
+                    toast.style.transform = 'translateX(100%)';
+
+                    setTimeout(() => {
+                        toast.style.display = 'none';
+                    }, 300);
+                }, 2500);
+            }
+            </script>
 
 
 <div class="text-center" style="margin-top: 50px; margin-bottom: 50px;">

@@ -97,5 +97,52 @@
 <script src="{{ asset('frontend/assets/js/main/imagesloaded.pkgd.min.js') }}"></script>
 <script src="{{ asset('frontend/assets/js/main/main.js') }}"></script>
 
+<div id="reportModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); z-index:9999;">
+    <div style="background:white; width:420px; margin:120px auto; padding:20px; border-radius:10px;">
+
+        <h4><i class="fa fa-flag"></i> Report Content</h4>
+
+        <input type="hidden" id="report_type">
+        <input type="hidden" id="report_id">
+
+        <label>Reason:</label>
+        <select id="report_reason" class="form-control">
+            <option value="spam">Spam or misleading</option>
+            <option value="abuse">Hate speech or abuse</option>
+            <option value="violence">Violence</option>
+            <option value="harassment">Harassment</option>
+            <option value="misinformation">Misinformation</option>
+            <option value="other">Other</option>
+        </select>
+
+        <br>
+
+        <label>Description (optional):</label>
+        <textarea id="report_description" class="form-control"></textarea>
+
+        <br>
+
+        <button class="btn btn-danger btn-sm" onclick="submitReport()">Submit</button>
+        <button class="btn btn-default btn-sm" onclick="closeReportModal()">Cancel</button>
+
+    </div>
+</div>
+
+<div id="report-toast" style="
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background: #28a745;
+    color: white;
+    padding: 12px 18px;
+    border-radius: 8px;
+    display: none;
+    z-index: 9999;
+    font-size: 14px;
+    box-shadow: 0 6px 18px rgba(0,0,0,0.2);
+">
+    ✔ <span id="report-toast-msg"></span>
+</div>
+
 </body>
 </html>

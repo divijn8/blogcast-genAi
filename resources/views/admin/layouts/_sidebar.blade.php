@@ -112,6 +112,13 @@
         </a>
     </li>
 
+    <li class="nav-item {{ request()->routeIs('admin.reports') ? 'active' : '' }}">
+        <a class="nav-link" href="{{ route('admin.reports') }}">
+            <i class="fas fa-fw fa-flag"></i>
+            <span>Reports</span>
+        </a>
+    </li>
+
     <!-- Categories -->
     <li class="nav-item {{ \App\Helpers\RoutingHelper::isCategoryRoute() ? 'active' : '' }}">
         <a class="nav-link {{ \App\Helpers\RoutingHelper::isCategoryRoute() ? '' : 'collapsed' }}"

@@ -11,7 +11,15 @@ class Post extends Model
 {
     use HasFactory;
 
-    protected $fillable=['title','slug','excerpt','author_id','body','thumbnail','category_id', 'published_at'];
+    protected $fillable = [
+        'title','slug','excerpt','author_id','body',
+        'thumbnail','category_id','published_at',
+        'status','is_disabled','report_count'
+    ];
+
+    public const STATUS_ACTIVE = 'active';
+    public const STATUS_UNDER_REVIEW = 'under_review';
+    public const STATUS_DISABLED = 'disabled';
 
      // Accessors:for consistent and customized data presentation.
     public function getThumbnailPathAttribute() {
@@ -47,8 +55,12 @@ class Post extends Model
         ->latest();
     }
 
-    public function scopePublished($query) {
-        return $query->where('published_at', '<=', now('Asia/Kolkata'));
+    public function scopePublished($query)
+    {
+        return $query
+            ->where('published_at', '<=', now('Asia/Kolkata'))
+            ->where('status', self::STATUS_ACTIVE)
+            ->where('is_disabled', false);
     }
 
     public function scopeSearch($query) {
@@ -57,5 +69,51 @@ class Post extends Model
             $query = $query->where('title', 'like', "%$searchParam%");
         }
         return $query;
+    }
+
+    public function reports()
+    {
+        return $this->morphMany(Report::class, 'reportable');
+    }
+
+    public function isActive()
+    {
+        return ($this->status ?? self::STATUS_ACTIVE) === self::STATUS_ACTIVE;
+    }
+
+    public function isUnderReview()
+    {
+        return $this->status === self::STATUS_UNDER_REVIEW;
+    }
+
+    public function isDisabled()
+    {
+        return $this->status === self::STATUS_DISABLED || $this->is_disabled;
+    }
+
+    public function scopeReported($query)
+    {
+        return $query->where('report_count', '>', 0);
+    }
+
+    public function handleNewReport()
+    {
+        $this->increment('report_count');
+
+        // refresh model to get updated value
+        $this->refresh();
+
+        if ($this->report_count >= 3 && $this->status === self::STATUS_ACTIVE) {
+            $this->update([
+                'status' => self::STATUS_UNDER_REVIEW
+            ]);
+        }
+
+        if ($this->report_count >= 7) {
+            $this->update([
+                'status' => self::STATUS_DISABLED,
+                'is_disabled' => true
+            ]);
+        }
     }
 }

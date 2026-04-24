@@ -27,14 +27,13 @@ class BlogsController extends Controller
 
         // Fetch drafts if the user is logged in and the draft flag is set
         if ($showDrafts && Auth::check()) {
-            $query->where('user_id', Auth::id())->whereNull('published_at');
+            $query->where('author_id', Auth::id())
+                ->whereNull('published_at');
         } else {
-            $query->whereNotNull('published_at');  // Only fetch published posts
+            $query->published(); // ✅ handles everything (status + disabled)
         }
 
-        // Paginate the results
-        $posts = $query->published()
-            ->orderBy('published_at', 'desc')->simplePaginate(9);
+        $posts = $query->orderBy('published_at', 'desc')->simplePaginate(9);
         $paginatedCount = $posts->count();
         $count = $query->count();
 
@@ -67,7 +66,10 @@ class BlogsController extends Controller
     }
 
     public function show(Request $request, string $slug) {
-        $post = Post::where('slug', $slug)->firstOrFail();
+        $post = Post::where('slug', $slug)
+                ->where('status', Post::STATUS_ACTIVE)
+                ->where('is_disabled', false)
+                ->firstOrFail();
         $categories = Category::all();
         $tags = Tag::all();
 
@@ -101,7 +103,7 @@ class BlogsController extends Controller
         if (request()->query('draft') && Auth::check()) {
             $query->where('user_id', Auth::id())->whereNull('published_at');
         } else {
-            $query->whereNotNull('published_at');
+            $query->published();
         }
 
         $posts = $query->simplePaginate(9);
@@ -127,7 +129,7 @@ class BlogsController extends Controller
         if (request()->query('draft') && Auth::check()) {
             $query->where('user_id', Auth::id())->whereNull('published_at');
         } else {
-            $query->whereNotNull('published_at');
+            $query->published();
         }
 
         $posts = $query->simplePaginate(9);

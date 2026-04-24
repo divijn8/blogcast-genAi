@@ -65,7 +65,21 @@ Route::prefix('admin')->name('admin.')->middleware(['auth'])->group(function () 
     Route::post('/ai/generate', [\App\Http\Controllers\AiController::class, 'generate'])->name('ai.generate');
     // Route::post('/ai/generate', [\App\Http\Controllers\AiController::class, 'generate'])->name('ai.generate');
 
+    // Reports (Moderation Panel)
+    Route::get('/reports', [\App\Http\Controllers\ReportController::class, 'index'])
+        ->name('reports');
+
+    Route::post('/reports/approve/{type}/{id}', [\App\Http\Controllers\ReportController::class, 'approve'])
+        ->name('reports.approve');
+
+    Route::post('/reports/disable/{type}/{id}', [\App\Http\Controllers\ReportController::class, 'disable'])
+        ->name('reports.disable');
+
 });
+
+Route::post('/report', [\App\Http\Controllers\ReportController::class, 'report'])
+    ->middleware('auth')
+    ->name('report.submit');
 
 Route::middleware(['auth'])->group((function() {
 

@@ -18,6 +18,9 @@ return new class extends Migration
             $table->longText('body');
             $table->unsignedBigInteger('category_id');
             $table->string('thumbnail',1000);
+            $table->boolean('is_disabled')->default(false);
+            $table->integer('report_count')->default(0);
+            $table->enum('status', ['active', 'under_review', 'disabled'])->default('active');
             $table->timestamp('published_at')->nullable();
             $table->timestamps();
 
