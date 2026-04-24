@@ -240,8 +240,8 @@
                         <input type="text" id="ai_topic" class="form-control-studio w-100 mb-3" placeholder="Topic: e.g. Why Bitcoin is rising?">
 
                         <select id="ai_speakers" class="form-control-studio w-100 mb-4">
-                            <option value="2">2 Speakers (Female Host & Male Expert)</option>
-                            <option value="3">3 Speakers (Host, Guest & Expert)</option>
+                            <option value="2">2 Speakers </option>
+                            <option value="3">3 Speakers </option>
                         </select>
 
                         <button id="btn-generate-script" class="btn btn-primary btn-block btn-lg btn-glow">
@@ -271,7 +271,7 @@
                         <div id="script-preview-list" class="mb-4 p-3 bg-light rounded" style="max-height: 350px; overflow-y: auto;"></div>
 
                         <button class="btn btn-success btn-block btn-lg btn-glow" id="use-this-script">
-                            <i class="fas fa-robot mr-2"></i> Generate Audio (Host: Female, Guest: Male)
+                            <i class="fas fa-robot mr-2"></i> Generate Audio
                         </button>
                         {{-- <button class="btn btn-link btn-block text-muted" onclick="$('#ai-results-view').hide(); $('#ai-options-view').show();">
                             Back to Concepts
@@ -418,7 +418,7 @@
             $(el).addClass('selected');
 
             $('#ai-options-view').hide();
-            $('#ai-loading').show().find('h4').text('Writing Script (Host: Female, Expert: Male)...');
+            $('#ai-loading').show().find('h4').text('Writing Script...');
 
             // Auto-fill Title
             $('#title').val(optionData.title);
@@ -480,7 +480,7 @@
 
             let btn = $(this);
             let originalText = btn.html();
-            btn.html('<i class="fas fa-spinner fa-spin mr-2"></i> Generating Audio (Piper)...').prop('disabled', true);
+            btn.html('<i class="fas fa-spinner fa-spin mr-2"></i> Generating Audio...').prop('disabled', true);
 
             $.post("{{ route('admin.ai.podcast.audio') }}", {
                 _token: "{{ csrf_token() }}",

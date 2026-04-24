@@ -99,7 +99,7 @@
         @endif
     </div>
 
-    <div class="row">
+    <div class="row mt-10">
         <div class="col-lg-9 col-md-8 mt25">
             <div class="row">
 
@@ -135,7 +135,7 @@
 
                                 <a href="{{ route('frontend.podcasts.show', $podcast->slug) }}"
                                 class="btn">
-                                    <i class="fa fa-play me-2"> Listen Now</i>
+                                     Listen Now <i class="fa fa-arrow-right ms-2"></i>
                                 </a>
 
                             </div>
