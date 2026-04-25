@@ -84,6 +84,17 @@
         .badge-green   { background: #e6fffa; color: #1cc88a; }
         .badge-purple  { background: #f3ebff; color: #6f42c1; }
         .badge-blue    { background: #e8f0fe; color: #4e73df; }
+
+        @keyframes slideIn {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
     </style>
 @endsection
 
@@ -283,6 +294,13 @@
         </div>
     </div>
 </div>
+
+<div id="toast-container" style="
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 9999;">
+</div>
 @endsection
 
 @section('page-level-scripts')
@@ -327,7 +345,10 @@
             let topic = $('#ai_topic').val();
             let speakers = $('#ai_speakers').val();
 
-            if(!topic) { alert("Please enter a topic."); return; }
+            if(!topic) {
+                showToast("Please enter a topic.", "warning");
+                return;
+            }
 
             $('#ai-input-view').hide();
             $('#ai-loading').show().find('h4').text('Designing Podcast Concepts...');
@@ -342,7 +363,7 @@
                     // Try to handle direct array return
                     if(Array.isArray(res)) res.options = res;
                     else {
-                        alert("AI could not generate concepts. Try again.");
+                        showToast("AI could not generate concepts. Try again.", "error");
                         $('#ai-loading').hide(); $('#ai-input-view').show();
                         return;
                     }
@@ -407,7 +428,7 @@
                 // ✅ Render once
                 $('#options-container').html(cardsHtml);
             }).fail(function(xhr) {
-                alert("Server Error: Check console.");
+                showToast("Server Error: Check console.", "error");
                 $('#ai-loading').hide(); $('#ai-input-view').show();
             });
         });
@@ -438,7 +459,10 @@
                 speakers: $('#ai_speakers').val()
             }, function(res) {
                 let scriptData = res.script || res;
-                if (!Array.isArray(scriptData)) { alert("Invalid script format."); return; }
+                if (!Array.isArray(scriptData)) {
+                    showToast("Invalid script format.", "error");
+                    return;
+                }
 
                 $('#ai-loading').hide();
                 $('#ai-results-view').show();
@@ -504,9 +528,9 @@
                     $('#audio-name').html(`<i class="fas fa-check-circle text-success"></i> Audio Ready for Publishing`);
                     $('#aiPodcastModal').modal('hide');
 
-                    alert('Audio Generated Successfully! Click "PUBLISH EPISODE" to save it.');
+                    showToast('Audio Generated Successfully! Click "PUBLISH EPISODE" to save it.', 'success');
                 } else {
-                    alert('Generation completed but no URL returned.');
+                    showToast('Generation completed but no URL returned.', 'warning');
                 }
                 // --- CRITICAL FIX END ---
 
@@ -516,7 +540,7 @@
                 // If it's the detailed exception from the backend
                 if(xhr.responseJSON && xhr.responseJSON.message) errorMsg = xhr.responseJSON.message;
 
-                alert('Audio generation failed: ' + errorMsg);
+                showToast('Audio generation failed: ' + errorMsg, 'error');
             })
             .always(function() {
                 btn.html(originalText).prop('disabled', false);
@@ -552,5 +576,40 @@
             }
         });
     });
+</script>
+<script>
+    function showToast(message, type = 'success') {
+        let bg = {
+            success: '#1cc88a',
+            error: '#e74a3b',
+            warning: '#f6c23e',
+            info: '#4e73df'
+        };
+
+        let toast = `
+            <div style="
+                min-width: 280px;
+                margin-bottom: 10px;
+                padding: 12px 16px;
+                color: white;
+                border-radius: 8px;
+                font-size: 14px;
+                background: ${bg[type] || bg.success};
+                box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+                animation: slideIn 0.3s ease;
+            ">
+                ${message}
+            </div>
+        `;
+
+        let container = document.getElementById('toast-container');
+        container.insertAdjacentHTML('beforeend', toast);
+
+        setTimeout(() => {
+            let el = container.firstElementChild;
+            if(el) el.remove();
+        }, 3000);
+
+    }
 </script>
 @endsection
