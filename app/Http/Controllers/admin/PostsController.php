@@ -17,6 +17,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 
 class PostsController extends Controller
 {
@@ -52,42 +53,77 @@ class PostsController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(CreatePostRequest $request) {
+    public function store(CreatePostRequest $request)
+{
     DB::beginTransaction();
 
-    try{
+    try {
+        // dd($request);
+        // 1. Get validated data from the Request class
         $data = $request->validated();
 
+        // 2. Handle Dynamic Category Creation
+        $categoryId = $request->category_id;
+        if (!is_numeric($categoryId)) {
+            // If it's text (a new category), create it
+            $newCategory = Category::firstOrCreate(
+                ['name' => $categoryId],
+                ['type' => 'blog']
+            );
+            $data['category_id'] = $newCategory->id;
+        }
+
+        // 3. Handle File Upload
         if ($request->hasFile('thumbnail')) {
-            $filePath = $request->file('thumbnail')->store('thumbnails','public');
+            $filePath = $request->file('thumbnail')->store('thumbnails', 'public');
             $data['thumbnail'] = $filePath;
         }
 
+        // 4. Handle Draft Status
         if ($request->has('save_as_draft')) {
             $data['published_at'] = null;
         }
 
+        // 5. Set Author & Create the Post
+        $data['slug'] = Str::slug($data['title']);
         $data['author_id'] = auth()->id();
         $post = Post::create($data);
 
-        if ($request->filled('tags')) {
-            $post->tags()->attach($request->tags);
+        // 6. Handle Dynamic Tags Attachments
+        if ($request->has('tags')) {
+            $tagIds = [];
+            foreach ($request->tags as $tagInput) {
+                if (is_numeric($tagInput)) {
+                    // It's an existing tag ID
+                    $tagIds[] = $tagInput;
+                } else {
+                    // It's a new tag text, create it in the database
+                    $newTag = Tag::firstOrCreate(
+                        ['name' => $tagInput],
+                        ['slug' => Str::slug($tagInput)]
+                    );
+                    $tagIds[] = $newTag->id;
+                }
+            }
+            // Attach all tags (both new and existing) to the post
+            $post->tags()->attach($tagIds);
         }
 
+        // If everything worked, commit to the database
         DB::commit();
 
+        // 7. Dispatch Jobs and Redirect
         if ($post->published_at) {
             DispatchPostNotificationJob::dispatch($post->id);
-        }
-
-        if($post->published_at) {
             return redirect()->route('admin.posts.index')->with('success','Post published successfully!');
         }
+
         return redirect()->route('admin.posts.drafts')->with('warning','Post drafted successfully!');
 
     } catch (\Exception $e) {
+        // If anything fails (like a tag failing to create), rollback everything
         DB::rollBack();
-        Log::error($e);
+        Log::error('Error creating post: ' . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
 
         return redirect()->route('admin.posts.index')
             ->with('error','Server issues. Try again later!');

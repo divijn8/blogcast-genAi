@@ -498,8 +498,33 @@
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
     <script type="text/javascript" src="https://unpkg.com/trix@2.0.8/dist/trix.umd.min.js"></script>
     <script>
-        $('.select2').select2();
-
+        $('#category_id').select2({
+    tags: true, // Naya item create karne ki permission
+    placeholder: "Select or type a new Category...",
+    createTag: function (params) {
+        var term = $.trim(params.term);
+        if (term === '') { return null; }
+        return {
+            id: term,
+            text: term + ' (New Category)', // User ko dikhane ke liye ki yeh naya hai
+            newTag: true
+        }
+    }
+});
+$('#tag_id').select2({
+    tags: true, // Naya tag create karne ki permission
+    tokenSeparators: [',', ' '], // Comma ya space dabane par tag ban jayega
+    placeholder: "Select or type new Tags...",
+    createTag: function (params) {
+        var term = $.trim(params.term);
+        if (term === '') { return null; }
+        return {
+            id: term,
+            text: term + ' (New Tag)',
+            newTag: true
+        }
+    }
+});
         flatpickr("#published_at", {
             enableTime: true,
             time_24hr: false,

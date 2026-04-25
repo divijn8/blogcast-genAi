@@ -26,9 +26,8 @@ class CreatePostRequest extends FormRequest
             'excerpt' => 'required|string|max:1000',
             'body' => 'required',
             'thumbnail' => 'required|image|mimes:jpg,jpeg,png|max:2048',
-            'category_id' => 'required|exists:categories,id',
+            'category_id' => 'required',
             'tags' => 'array|required',
-            'tags.*' => 'exists:tags,id',
             'published_at' => 'nullable|date',
         ];
     }
